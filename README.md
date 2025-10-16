@@ -7,11 +7,18 @@
 
 #### Avant de commencer 
 
-Cloner le projet depuis le terminal.
+1. Cloner le projet depuis le terminal.
 
 ```
 git clone https://gitlab.etu.umontpellier.fr/p00000013857/hai914i
 ```
+
+2. Créer un projet dans le gitlab UM où vous pourrez déposer votre projet
+
+Vous avez le choix de comment faire pour réaliser cette opération. Par exemple, vous pouvez changer juste l'origin du projet que vous venez de cloner (pour les locaux, rappel du cours HAI501I - Ateliers de Génie Logiciel)
+``
+git remote set-url origin ___indiquer_ici_l_adresse_du_depot_que_vous_venez_de_creer_sur_gitlabUM___
+``
 
 ---
 
