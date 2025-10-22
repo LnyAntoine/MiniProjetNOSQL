@@ -41,7 +41,7 @@ public class RDFHexaStoreTest {
         assertTrue(store.addAll(rdfAtoms.stream()), "Les RDFAtoms devraient être ajoutés avec succès.");
 
         // Vérifier que tous les atomes sont présents
-        Collection<Atom> atoms = store.getAtoms();
+        Collection<RDFAtom> atoms = store.getAtoms();
         assertTrue(atoms.contains(rdfAtom1), "La base devrait contenir le premier RDFAtom ajouté.");
         assertTrue(atoms.contains(rdfAtom2), "La base devrait contenir le second RDFAtom ajouté.");
 

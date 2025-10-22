@@ -38,7 +38,7 @@ public class RDFHexaStore implements RDFStorage {
     }
 
     @Override
-    public Collection<Atom> getAtoms() {
+    public Collection<RDFAtom> getAtoms() {
         throw new NotImplementedException();
     }
 }

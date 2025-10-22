@@ -49,7 +49,7 @@ public interface RDFStorage {
      *
      * @return une collection d'atomes
      */
-    Collection<Atom> getAtoms();
+    Collection<RDFAtom> getAtoms();
 
     /**
      * Ajoute des RDFAtom dans le store.
