@@ -46,7 +46,7 @@ Tous les membres du groupe doivent être présents et présenter le travail réa
 2. **Évaluation des requêtes en étoile** : code + rapport (3 pages) - **29 Novembre**.  
 3. **Analyse des bancs d'essai et plan des tests à réaliser.** : déscription des tests **6 Décembre** 
 4. **Analyse des performances** : rapport (5 pages) - **13 Décembre**.
-5. **Document final** (10 pages + code) : **~15~22 décembre** .
+5. **Document final** (10 pages + code) : **22 décembre** .
 
 ## Mini-soutenances / dates des évaluations en présentiel
 1. **Dictionnaire, index (Hexastore)** : **16 Novembre**.  
