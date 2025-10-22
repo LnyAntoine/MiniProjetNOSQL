@@ -183,6 +183,18 @@ Le dictionnaire doit permettre d’encoder et de décoder les triplets de maniè
 
 ---
 
+### Stockage Row-Store Giant-Table (rendu 15 Novembre)
+
+Le stockage giant-table prévoit simplement de enregistrer la liste des triplets encodés dans la base.  
+
+On vous demande d'implémenter ce stockage, en créant une classe qui implémente l'interface **RDFStorage.java**. 
+L'intérêt de cette implémentation sera de disposer d'un cadre de base pour la comparation des performances par rapport à la version avec index.
+
+- **Lien avec le code :**
+  - La méthode `add(RDFAtom a)` de Giant-Table est utilisée pour l’insertion de données.  
+  - La méthode `match(RDFAtom a)` de Giant-Table est utilisée pour l’interrogation des données.
+---
+
 ### L’index (rendu 15 Novembre)
 
 L’index permet une évaluation efficace des requêtes et est adapté au système de persistance choisi.  
@@ -192,6 +204,11 @@ Dans ce projet, il est demandé d’implémenter l’approche **hexastore** pour
 - **Lien avec le code :**
   - La méthode `add(RDFAtom a)` de l’Hexastore est utilisée pour l’insertion de données.  
   - La méthode `match(RDFAtom a)` est utilisée pour l’interrogation des données.
+
+- Dans votre index, on vous demande d'enregistrer des statistiques permettant de connaitre la séléctivité des patrons de triplet RDF (voir le cours). 
+
+- La solution basique pour l'implémentation de l'index est de s'appuyer sur des `HahsMap`. Si vous rencontrez des difficultés avec Java, il s'agit de la solution à préférer. Alternativement, on vous propose d'utiliser les arbres B+ proposés par `org.mapdb.BTreeMap` ([lien](https://mapdb.org/book/btreemap/)) : cette solution solution donne lieu à un bonus et, enfin, ne diffère pas trop de l'implémentation avec `HashMap`.
+
 
 ---
 
