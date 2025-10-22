@@ -14,7 +14,7 @@ import org.eclipse.rdf4j.query.algebra.helpers.StatementPatternCollector;
 import org.eclipse.rdf4j.query.parser.ParsedQuery;
 import org.eclipse.rdf4j.query.parser.sparql.SPARQLParser;
 
-import qengine.model.RDFAtom;
+import qengine.model.RDFTriple;
 import qengine.model.StarQuery;
 
 import java.io.IOException;
@@ -104,7 +104,7 @@ public class StarQuerySparQLParser implements Parser<Query> {
 
         // Extraire les variables et les triplets RDF
         Map<String, Variable> variables = new HashMap<>();
-        List<RDFAtom> rdfAtoms = new ArrayList<>();
+        List<RDFTriple> rdfAtoms = new ArrayList<>();
         Variable centralVariable = null;
 
         for (StatementPattern pattern : patterns) {
@@ -121,7 +121,7 @@ public class StarQuerySparQLParser implements Parser<Query> {
                 throw new IllegalArgumentException("Aucune variable centrale partagée trouvée dans les triplets RDF.");
             }
 
-            rdfAtoms.add(new RDFAtom(subject, predicate, object));
+            rdfAtoms.add(new RDFTriple(subject, predicate, object));
         }
 
         if (centralVariable == null) {

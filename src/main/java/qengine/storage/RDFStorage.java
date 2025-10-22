@@ -4,9 +4,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.stream.Stream;
 
-import fr.boreal.model.logicalElements.api.Atom;
 import fr.boreal.model.logicalElements.api.Substitution;
-import qengine.model.RDFAtom;
+import qengine.model.RDFTriple;
 import qengine.model.StarQuery;
 
 /**
@@ -17,17 +16,17 @@ public interface RDFStorage {
     /**
      * Ajoute un RDFAtom dans le store.
      *
-     * @param a le RDFAtom à ajouter
+     * @param t le triplet à ajouter
      * @return true si le RDFAtom a été ajouté avec succès, false s'il est déjà présent
      */
-    boolean add(RDFAtom a);
+    boolean add(RDFTriple t);
 
     /**
      * @param a atom
      * @return un itérateur de substitutions correspondant aux match des atomes
      *          (i.e., sur quels termes s'envoient les variables)
      */
-    Iterator<Substitution> match(RDFAtom a);
+    Iterator<Substitution> match(RDFTriple a);
 
 
     /**
@@ -35,6 +34,14 @@ public interface RDFStorage {
      * @return an itérateur de subsitutions décrivrant les réponses à la requete
      */
     Iterator<Substitution> match(StarQuery q);
+
+
+    /**
+     * @param a atom
+     * @return
+     */
+    long howMany(RDFTriple a);
+
 
     /**
      * Retourne le nombre d'atomes dans le Store.
@@ -49,7 +56,7 @@ public interface RDFStorage {
      *
      * @return une collection d'atomes
      */
-    Collection<RDFAtom> getAtoms();
+    Collection<RDFTriple> getAtoms();
 
     /**
      * Ajoute des RDFAtom dans le store.
@@ -57,7 +64,7 @@ public interface RDFStorage {
      * @param atoms les RDFAtom à ajouter
      * @return true si au moins un RDFAtom a été ajouté, false s'ils sont tous déjà présents
      */
-    default boolean addAll(Stream<RDFAtom> atoms) {
+    default boolean addAll(Stream<RDFTriple> atoms) {
         return atoms.map(this::add).reduce(Boolean::logicalOr).orElse(false);
     }
 
@@ -67,7 +74,7 @@ public interface RDFStorage {
      * @param atoms les RDFAtom à ajouter
      * @return true si au moins un RDFAtom a été ajouté, false s'ils sont tous déjà présents
      */
-    default boolean addAll(Collection<RDFAtom> atoms) {
+    default boolean addAll(Collection<RDFTriple> atoms) {
         return this.addAll(atoms.stream());
     }
 }

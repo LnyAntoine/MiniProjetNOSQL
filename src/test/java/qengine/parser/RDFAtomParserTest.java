@@ -1,8 +1,7 @@
 package qengine.parser;
 
 import org.junit.jupiter.api.Test;
-import qengine.model.RDFAtom;
-import qengine.parser.RDFAtomParser;
+import qengine.model.RDFTriple;
 
 import java.io.File;
 import java.util.List;
@@ -18,15 +17,15 @@ class RDFAtomParserTest {
     @Test
     void testParseValidRDFAtoms() throws Exception {
         File rdfFile = new File("src/test/resources/sample_data.nt");
-        try (RDFAtomParser parser = new RDFAtomParser(rdfFile)) {
+        try (RDFTriplesParser parser = new RDFTriplesParser(rdfFile)) {
             assertTrue(parser.hasNext(), "Le parser devrait trouver des triplets RDF.");
 
-            RDFAtom atom1 = parser.next();
+            RDFTriple atom1 = parser.next();
             assertEquals("http://example.org/subject1", atom1.getTerms()[0].label(), "Sujet incorrect.");
             assertEquals("http://example.org/predicate1", atom1.getTerms()[1].label(), "Prédicat incorrect.");
             assertEquals("http://example.org/object1", atom1.getTerms()[2].label(), "Objet incorrect.");
 
-            RDFAtom atom2 = parser.next();
+            RDFTriple atom2 = parser.next();
             assertEquals("http://example.org/subject2", atom2.getTerms()[0].label(), "Sujet incorrect.");
             assertEquals("http://example.org/predicate2", atom2.getTerms()[1].label(), "Prédicat incorrect.");
             assertEquals("http://example.org/object2", atom2.getTerms()[2].label(), "Objet incorrect.");
@@ -38,7 +37,7 @@ class RDFAtomParserTest {
     @Test
     void testParseEmptyFile() throws Exception {
         File emptyFile = new File("src/test/resources/empty.nt");
-        try (RDFAtomParser parser = new RDFAtomParser(emptyFile)) {
+        try (RDFTriplesParser parser = new RDFTriplesParser(emptyFile)) {
             assertFalse(parser.hasNext(), "Le parser ne devrait pas trouver de triplets dans un fichier vide.");
         }
     }
@@ -46,7 +45,7 @@ class RDFAtomParserTest {
     @Test
     void testMultipleCloseCalls() throws Exception {
         File rdfFile = new File("src/test/resources/sample_data.nt");
-        try (RDFAtomParser parser = new RDFAtomParser(rdfFile)) {
+        try (RDFTriplesParser parser = new RDFTriplesParser(rdfFile)) {
             assertTrue(parser.hasNext(), "Le parser devrait trouver des triplets RDF.");
             parser.close();
             parser.close(); // Appel supplémentaire pour tester la gestion des fermetures multiples
@@ -56,8 +55,8 @@ class RDFAtomParserTest {
     @Test
     void testNextWithoutHasNext() throws Exception {
         File rdfFile = new File("src/test/resources/sample_data.nt");
-        try (RDFAtomParser parser = new RDFAtomParser(rdfFile)) {
-            RDFAtom atom1 = parser.next();
+        try (RDFTriplesParser parser = new RDFTriplesParser(rdfFile)) {
+            RDFTriple atom1 = parser.next();
             assertEquals("http://example.org/subject1", atom1.getTerms()[0].label(), "Sujet incorrect.");
         }
     }
@@ -65,7 +64,7 @@ class RDFAtomParserTest {
     @Test
     void testParserExhaustion() throws Exception {
         File rdfFile = new File("src/test/resources/sample_data.nt");
-        try (RDFAtomParser parser = new RDFAtomParser(rdfFile)) {
+        try (RDFTriplesParser parser = new RDFTriplesParser(rdfFile)) {
             while (parser.hasNext()) {
                 parser.next();
             }
@@ -77,9 +76,9 @@ class RDFAtomParserTest {
     @Test
     void testGetRDFAtoms() throws Exception {
         File rdfFile = new File("src/test/resources/sample_data.nt");
-        try (RDFAtomParser parser = new RDFAtomParser(rdfFile)) {
+        try (RDFTriplesParser parser = new RDFTriplesParser(rdfFile)) {
             // Utiliser la méthode getRDFAtoms pour récupérer les atomes
-            List<RDFAtom> rdfAtoms = parser.getRDFAtoms().collect(Collectors.toList());
+            List<RDFTriple> rdfAtoms = parser.getRDFAtoms().collect(Collectors.toList());
 
             // Vérifier que les atomes ont été correctement parsés
             assertEquals(2, rdfAtoms.size(), "Le nombre d'atomes RDF doit être 2.");

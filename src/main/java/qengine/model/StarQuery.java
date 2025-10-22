@@ -21,8 +21,8 @@ public class StarQuery implements Query {
     // Label de la requête
     private final String label;
 
-    // Collection des triplets RDF (les atomes de la requête)
-    private final List<RDFAtom> rdfAtoms;
+    // Collection des triplets RDF (les conditions de la requête)
+    private final List<RDFTriple> rdfTriples;
 
     // variables réponses
     private final Collection<Variable> answerVariables;
@@ -34,41 +34,41 @@ public class StarQuery implements Query {
      * Constructeur pour une requête en étoile.
      *
      * @param label           le label de la requête
-     * @param rdfAtoms        la collection des triplets RDF
+     * @param rdfTriples        la collection des triplets RDF
      * @param answerVariables les variables réponses
      * @throws NullPointerException     si l'un des paramètres est null
-     * @throws IllegalArgumentException si les atomes RDF ne forment pas une requête en étoile
+     * @throws IllegalArgumentException si les triplets RDF ne forment pas une requête en étoile
      */
-    public StarQuery(String label, List<RDFAtom> rdfAtoms, Collection<Variable> answerVariables) {
+    public StarQuery(String label, List<RDFTriple> rdfTriples, Collection<Variable> answerVariables) {
         this.label = Objects.requireNonNull(label, "Le label ne peut pas être null.");
-        this.rdfAtoms = Objects.requireNonNull(rdfAtoms, "Les triplets RDF ne peuvent pas être null.");
+        this.rdfTriples = Objects.requireNonNull(rdfTriples, "Les triplets RDF ne peuvent pas être null.");
         this.answerVariables = Objects.requireNonNull(answerVariables, "Les variables réponses ne peuvent pas être null.");
 
         // Déterminer la variable centrale
-        this.centralVariable = determineCentralVariable(rdfAtoms);
+        this.centralVariable = determineCentralVariable(rdfTriples);
 
         // Vérifier que toutes les variables réponses sont valides
-        validateAnswerVariables(answerVariables, rdfAtoms);
+        validateAnswerVariables(answerVariables, rdfTriples);
     }
 
     /**
      * Détermine la variable centrale partagée par tous les triplets RDF.
      *
-     * @param rdfAtoms la collection de triplets RDF
+     * @param rdfTriples la collection de triplets RDF
      * @return la variable centrale
      * @throws IllegalArgumentException si les triplets ne partagent pas une variable commune
      */
-    private Variable determineCentralVariable(Collection<RDFAtom> rdfAtoms) {
-        Set<Variable> sharedVariables = rdfAtoms.stream()
-                .flatMap(atom -> Arrays.stream(atom.getTerms()))
+    private Variable determineCentralVariable(Collection<RDFTriple> rdfTriples) {
+        Set<Variable> sharedVariables = rdfTriples.stream()
+                .flatMap(triple -> Arrays.stream(triple.getTerms()))
                 .filter(term -> term instanceof Variable)
                 .map(term -> (Variable) term)
                 .collect(Collectors.toSet());
 
         // Vérifier qu'une seule variable est partagée
         for (Variable candidate : sharedVariables) {
-            if (rdfAtoms.stream()
-                    .allMatch(atom -> Arrays.asList(atom.getTerms()).contains(candidate))) {
+            if (rdfTriples.stream()
+                    .allMatch(triple -> Arrays.asList(triple.getTerms()).contains(candidate))) {
                 return candidate;
             }
         }
@@ -80,12 +80,12 @@ public class StarQuery implements Query {
      * Valide que toutes les variables réponses appartiennent aux triplets RDF.
      *
      * @param answerVariables les variables réponses
-     * @param rdfAtoms        la collection de triplets RDF
+     * @param rdfTriples        la collection de triplets RDF
      * @throws IllegalArgumentException si une variable de réponse n'est pas présente
      */
-    private void validateAnswerVariables(Collection<Variable> answerVariables, Collection<RDFAtom> rdfAtoms) {
-        Set<Term> allTerms = rdfAtoms.stream()
-                .flatMap(atom -> Arrays.stream(atom.getTerms()))
+    private void validateAnswerVariables(Collection<Variable> answerVariables, Collection<RDFTriple> rdfTriples) {
+        Set<Term> allTerms = rdfTriples.stream()
+                .flatMap(triple -> Arrays.stream(triple.getTerms()))
                 .collect(Collectors.toSet());
 
         for (Variable answerVariable : answerVariables) {
@@ -130,8 +130,8 @@ public class StarQuery implements Query {
      *
      * @return la collection des triplets RDF
      */
-    public List<RDFAtom> getRdfAtoms() {
-        return rdfAtoms;
+    public List<RDFTriple> getRdfAtoms() {
+        return rdfTriples;
     }
 
     /**
@@ -140,7 +140,7 @@ public class StarQuery implements Query {
      * @return FOQuery
      */
     public FOQuery<FOFormulaConjunction> asFOQuery() {
-        FOFormulaConjunction conjunction = FOFormulaFactory.instance().createOrGetConjunction(this.rdfAtoms);
+        FOFormulaConjunction conjunction = FOFormulaFactory.instance().createOrGetConjunction(this.rdfTriples);
         return FOQueryFactory.instance().createOrGetQuery(this.label, conjunction, this.answerVariables);
     }
 
@@ -150,21 +150,21 @@ public class StarQuery implements Query {
         if (o == null || getClass() != o.getClass()) return false;
         StarQuery that = (StarQuery) o;
         return label.equals(that.label) &&
-                rdfAtoms.equals(that.rdfAtoms) &&
+                rdfTriples.equals(that.rdfTriples) &&
                 answerVariables.equals(that.answerVariables) &&
                 centralVariable.equals(that.centralVariable);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(label, rdfAtoms, answerVariables, centralVariable);
+        return Objects.hash(label, rdfTriples, answerVariables, centralVariable);
     }
 
     @Override
     public String toString() {
         return "StarQuery{" +
                 "label='" + label + '\'' +
-                ",\n\t rdfAtoms=" + rdfAtoms +
+                ",\n\t rdfTriples=" + rdfTriples +
                 ",\n\t answerVariables=" + answerVariables +
                 ",\n\t centralVariable=" + centralVariable +
                 '}';

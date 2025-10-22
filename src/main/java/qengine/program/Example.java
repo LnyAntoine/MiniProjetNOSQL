@@ -10,9 +10,9 @@ import fr.boreal.model.queryEvaluation.api.FOQueryEvaluator;
 import fr.boreal.query_evaluation.generic.GenericFOQueryEvaluator;
 import fr.boreal.storage.natives.SimpleInMemoryGraphStore;
 import org.eclipse.rdf4j.rio.RDFFormat;
-import qengine.model.RDFAtom;
+import qengine.model.RDFTriple;
 import qengine.model.StarQuery;
-import qengine.parser.RDFAtomParser;
+import qengine.parser.RDFTriplesParser;
 import qengine.parser.StarQuerySparQLParser;
 
 import java.io.FileReader;
@@ -32,7 +32,7 @@ public final class Example {
 		 * Exemple d'utilisation des deux parsers
 		 */
 		System.out.println("=== Parsing RDF Data ===");
-		List<RDFAtom> rdfAtoms = parseRDFData(SAMPLE_DATA_FILE);
+		List<RDFTriple> rdfAtoms = parseRDFData(SAMPLE_DATA_FILE);
 
 		System.out.println("\n=== Parsing Sample Queries ===");
 		List<StarQuery> starQueries = parseSparQLQueries(SAMPLE_QUERY_FILE);
@@ -42,8 +42,8 @@ public final class Example {
 		 */
 		System.out.println("\n=== Executing the queries with Integraal ===");
 		FactBase factBase = new SimpleInMemoryGraphStore();
-		for (RDFAtom atom : rdfAtoms) {
-			factBase.add(atom);  // Stocker chaque RDFAtom dans le store
+		for (RDFTriple triple : rdfAtoms) {
+			factBase.add(triple);  // Stocker chaque RDFAtom dans le store
 		}
 
 		// Exécuter les requêtes sur le store
@@ -58,18 +58,18 @@ public final class Example {
 	 * @param rdfFilePath Chemin vers le fichier RDF à parser
 	 * @return Liste des RDFAtoms parsés
 	 */
-	private static List<RDFAtom> parseRDFData(String rdfFilePath) throws IOException {
+	private static List<RDFTriple> parseRDFData(String rdfFilePath) throws IOException {
 		FileReader rdfFile = new FileReader(rdfFilePath);
-		List<RDFAtom> rdfAtoms = new ArrayList<>();
+		List<RDFTriple> rdfAtoms = new ArrayList<>();
 
-		try (RDFAtomParser rdfAtomParser = new RDFAtomParser(rdfFile, RDFFormat.NTRIPLES)) {
+		try (RDFTriplesParser rdfAtomParser = new RDFTriplesParser(rdfFile, RDFFormat.NTRIPLES)) {
 			int count = 0;
 			while (rdfAtomParser.hasNext()) {
-				RDFAtom atom = rdfAtomParser.next();
-				rdfAtoms.add(atom);  // Stocker l'atome dans la collection
-				System.out.println("RDF Atom #" + (++count) + ": " + atom);
+				RDFTriple triple = rdfAtomParser.next();
+				rdfAtoms.add(triple);  // Stocker le triplet dans la collection
+				System.out.println("RDF Triple #" + (++count) + ": " + triple);
 			}
-			System.out.println("Total RDF Atoms parsed: " + count);
+			System.out.println("Total RDF Triples parsed: " + count);
 		}
 		return rdfAtoms;
 	}
@@ -93,7 +93,7 @@ public final class Example {
 					System.out.println("Star Query #" + (++queryCount) + ":");
 					System.out.println("  Central Variable: " + starQuery.getCentralVariable().label());
 					System.out.println("  RDF Atoms:");
-					starQuery.getRdfAtoms().forEach(atom -> System.out.println("    " + atom));
+					starQuery.getRdfAtoms().forEach(triple -> System.out.println("    " + triple));
 				} else {
 					System.err.println("Requête inconnue ignorée.");
 				}
@@ -107,7 +107,7 @@ public final class Example {
 	 * Exécute une requête en étoile sur le store et affiche les résultats.
 	 *
 	 * @param starQuery La requête à exécuter
-	 * @param factBase  Le store contenant les atomes
+	 * @param factBase  Le store contenant les triplets
 	 */
 	private static void executeStarQuery(StarQuery starQuery, FactBase factBase) {
 		FOQuery<FOFormulaConjunction> foQuery = starQuery.asFOQuery(); // Conversion en FOQuery

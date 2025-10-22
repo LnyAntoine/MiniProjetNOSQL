@@ -14,23 +14,23 @@ import fr.boreal.io.rdf.RDFTranslationMode;
 import fr.boreal.model.logicalElements.api.Atom;
 import fr.boreal.model.logicalElements.api.Predicate;
 import fr.boreal.model.logicalElements.factory.impl.SameObjectPredicateFactory;
-import qengine.model.RDFAtom;
+import qengine.model.RDFTriple;
 
 /**
  * Parser pour transformer des triplets RDF en RDFAtom.
  */
-public class RDFAtomParser implements Parser<RDFAtom> {
+public class RDFTriplesParser implements Parser<RDFTriple> {
 
     private static final Predicate TRIPLE_PREDICATE = SameObjectPredicateFactory.instance()
             .createOrGetPredicate("triple", 3);
 
     private final RDFParser parser;
 
-    public RDFAtomParser(File file) throws IOException {
+    public RDFTriplesParser(File file) throws IOException {
         this(new FileReader(file), getRDFFormat(file));
     }
 
-    public RDFAtomParser(Reader reader, RDFFormat format) {
+    public RDFTriplesParser(Reader reader, RDFFormat format) {
         // Utilisation explicite du mode RawRDFTranslator
         this.parser = new RDFParser(reader, format, null, RDFTranslationMode.Raw);
     }
@@ -41,13 +41,13 @@ public class RDFAtomParser implements Parser<RDFAtom> {
     }
 
     @Override
-    public RDFAtom next() {
+    public RDFTriple next() {
         Object obj = parser.next();
 
         if (obj instanceof Atom atom) {
             return convertToRDFAtom(atom);
         } else {
-            throw new IllegalArgumentException("L'objet parsé n'est pas un atome RDF.");
+            throw new IllegalArgumentException("L'objet parsé n'est pas un triplet RDF.");
         }
     }
 
@@ -57,12 +57,12 @@ public class RDFAtomParser implements Parser<RDFAtom> {
     }
 
     /**
-     * Retourne un flux de tous les atomes RDF parsés.
+     * Retourne un flux de tous les triplets RDF parsés.
      *
      * @return un flux de RDFAtom
      */
-    public Stream<RDFAtom> getRDFAtoms() {
-        return this.streamParsedObjects(RDFAtom.class);
+    public Stream<RDFTriple> getRDFAtoms() {
+        return this.streamParsedObjects(RDFTriple.class);
     }
 
     private static RDFFormat getRDFFormat(File file) {
@@ -70,12 +70,12 @@ public class RDFAtomParser implements Parser<RDFAtom> {
     }
 
     /**
-     * Convertit un atome Integraal standard en RDFAtom.
+     * Convertit un atome Integraal standard en RDFTriple.
      *
      * @param atom L'atome à convertir
-     * @return L'instance correspondante de RDFAtom
+     * @return L'instance correspondante de RDFTriple
      */
-    private RDFAtom convertToRDFAtom(Atom atom) {
+    private RDFTriple convertToRDFAtom(Atom atom) {
         if (atom.getTerms().length != 3) {
             throw new IllegalArgumentException("Un RDFAtom doit contenir exactement trois termes.");
         }
@@ -84,6 +84,6 @@ public class RDFAtomParser implements Parser<RDFAtom> {
             throw new IllegalArgumentException("Le prédicat de l'atome n'est pas 'triple'.");
         }
 
-        return new RDFAtom(atom.getTerms()[0], atom.getTerms()[1], atom.getTerms()[2]);
+        return new RDFTriple(atom.getTerms()[0], atom.getTerms()[1], atom.getTerms()[2]);
     }
 }

@@ -4,7 +4,7 @@ import fr.boreal.model.logicalElements.api.Term;
 import fr.boreal.model.logicalElements.api.Variable;
 import fr.boreal.model.query.api.Query;
 import org.junit.jupiter.api.Test;
-import qengine.model.RDFAtom;
+import qengine.model.RDFTriple;
 import qengine.model.StarQuery;
 
 import java.io.IOException;
@@ -33,7 +33,7 @@ class StarQuerySparQLParserTest {
             assertEquals("?v0", starQuery.getCentralVariable().label(), "La variable centrale devrait être ?v0.");
             assertEquals(1, starQuery.getRdfAtoms().size(), "La première requête devrait contenir un triplet RDF.");
 
-            RDFAtom atom = starQuery.getRdfAtoms().iterator().next();
+            RDFTriple atom = starQuery.getRdfAtoms().iterator().next();
             Term subject = atom.getTerms()[0];
             Term predicate = atom.getTerms()[1];
             Term object = atom.getTerms()[2];
@@ -58,7 +58,7 @@ class StarQuerySparQLParserTest {
                 assertEquals("?v0", starQuery.getCentralVariable().label(), "Toutes les requêtes devraient partager la variable centrale ?v0.");
 
                 // Vérification des triplets RDF
-                Collection<RDFAtom> rdfAtoms = starQuery.getRdfAtoms();
+                Collection<RDFTriple> rdfAtoms = starQuery.getRdfAtoms();
                 if (queryCount == 0) {
                     assertEquals(1, rdfAtoms.size(), "La première requête devrait contenir un seul triplet RDF.");
                 } else if (queryCount == 1) {

@@ -12,7 +12,7 @@ import java.util.List;
  * Représentation d'un triplet RDF sous forme d'atome.
  * Le prédicat est toujours "triple" et d'arité 3.
  */
-public class RDFAtom extends AtomImpl {
+public class RDFTriple extends AtomImpl {
 
     public static final Predicate TRIPLE_PREDICATE =
             SameObjectPredicateFactory.instance().createOrGetPredicate("triple", 3);
@@ -22,7 +22,7 @@ public class RDFAtom extends AtomImpl {
      * @param a les trois termes du triplet RDF (sujet, prédicat, objet)
      * @throws IllegalArgumentException si le nombre de termes n'est pas égal à 3
      */
-    public RDFAtom(Atom a) {
+    public RDFTriple(Atom a) {
         super(TRIPLE_PREDICATE, a.getTerms());
         if (!a.getPredicate().equals(TRIPLE_PREDICATE)) {
             throw new IllegalArgumentException("Not a triple.");
@@ -35,7 +35,7 @@ public class RDFAtom extends AtomImpl {
      * @param terms les trois termes du triplet RDF (sujet, prédicat, objet)
      * @throws IllegalArgumentException si le nombre de termes n'est pas égal à 3
      */
-    public RDFAtom(List<Term> terms) {
+    public RDFTriple(List<Term> terms) {
         super(TRIPLE_PREDICATE, terms);
     }
 
@@ -45,13 +45,13 @@ public class RDFAtom extends AtomImpl {
      * @param terms les trois termes du triplet RDF (sujet, prédicat, objet)
      * @throws IllegalArgumentException si le nombre de termes n'est pas égal à 3
      */
-    public RDFAtom(Term... terms) {
+    public RDFTriple(Term... terms) {
         super(TRIPLE_PREDICATE, terms);
         validateTerms(terms);
     }
 
     /**
-     * Valide que les termes respectent les contraintes de l'atome RDF.
+     * Valide que les termes respectent les contraintes du triplet RDF.
      *
      * @param terms les termes à valider
      * @throws IllegalArgumentException si les contraintes ne sont pas respectées
@@ -76,7 +76,7 @@ public class RDFAtom extends AtomImpl {
     }
 
     /**
-     * @return a string representation of this atom of the form p(t1,...,tn)
+     * @return a string representation of this triple of the form p(t1,...,tn)
      */
     @Override
     public String toString() {

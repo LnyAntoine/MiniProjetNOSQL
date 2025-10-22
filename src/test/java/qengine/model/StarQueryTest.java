@@ -29,10 +29,10 @@ class StarQueryTest {
         Term predicate2 = termFactory.createOrGetLiteral("http://example.org/predicate2");
         Term object2 = termFactory.createOrGetLiteral("http://example.org/object2");
 
-        RDFAtom atom1 = new RDFAtom(centralVariable, predicate1, object1);
-        RDFAtom atom2 = new RDFAtom(centralVariable, predicate2, object2);
+        RDFTriple triple1 = new RDFTriple(centralVariable, predicate1, object1);
+        RDFTriple triple2 = new RDFTriple(centralVariable, predicate2, object2);
 
-        List<RDFAtom> rdfAtoms = List.of(atom1, atom2);
+        List<RDFTriple> rdfAtoms = List.of(triple1, triple2);
         Collection<Variable> answerVariables = List.of(centralVariable);
 
         StarQuery query = new StarQuery("Requête étoile valide", rdfAtoms, answerVariables);
@@ -53,10 +53,10 @@ class StarQueryTest {
         Term predicate2 = termFactory.createOrGetLiteral("http://example.org/predicate2");
         Term object2 = termFactory.createOrGetLiteral("http://example.org/object2");
 
-        RDFAtom atom1 = new RDFAtom(var1, predicate1, object1);
-        RDFAtom atom2 = new RDFAtom(var2, predicate2, object2);
+        RDFTriple triple1 = new RDFTriple(var1, predicate1, object1);
+        RDFTriple triple2 = new RDFTriple(var2, predicate2, object2);
 
-        List<RDFAtom> rdfAtoms = List.of(atom1, atom2);
+        List<RDFTriple> rdfAtoms = List.of(triple1, triple2);
         Collection<Variable> answerVariables = List.of(var1, var2);
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
@@ -72,9 +72,9 @@ class StarQueryTest {
         Term predicate = termFactory.createOrGetLiteral("http://example.org/predicate");
         Term object = termFactory.createOrGetLiteral("http://example.org/object");
 
-        RDFAtom atom = new RDFAtom(centralVariable, predicate, object);
+        RDFTriple triple = new RDFTriple(centralVariable, predicate, object);
 
-        List<RDFAtom> rdfAtoms = List.of(atom);
+        List<RDFTriple> rdfAtoms = List.of(triple);
 
         Variable invalidVariable = (Variable) termFactory.createOrGetVariable("?y");
         Collection<Variable> answerVariables = List.of(invalidVariable);
@@ -95,10 +95,10 @@ class StarQueryTest {
         Term predicate2 = termFactory.createOrGetLiteral("http://example.org/predicate2");
         Term object2 = termFactory.createOrGetLiteral("http://example.org/object2");
 
-        RDFAtom atom1 = new RDFAtom(centralVariable, predicate1, object1);
-        RDFAtom atom2 = new RDFAtom(centralVariable, predicate2, object2);
+        RDFTriple triple1 = new RDFTriple(centralVariable, predicate1, object1);
+        RDFTriple triple2 = new RDFTriple(centralVariable, predicate2, object2);
 
-        List<RDFAtom> rdfAtoms = List.of(atom1, atom2);
+        List<RDFTriple> rdfAtoms = List.of(triple1, triple2);
         Collection<Variable> answerVariables = List.of(centralVariable);
 
         StarQuery query1 = new StarQuery("Requête étoile", rdfAtoms, answerVariables);
@@ -119,8 +119,8 @@ class StarQueryTest {
         Term predicate = termFactory.createOrGetLiteral("http://example.org/predicate");
         Term object = termFactory.createOrGetLiteral("http://example.org/object");
 
-        RDFAtom atom = new RDFAtom(centralVariable, predicate, object);
-        List<RDFAtom> rdfAtoms = List.of(atom);
+        RDFTriple triple = new RDFTriple(centralVariable, predicate, object);
+        List<RDFTriple> rdfAtoms = List.of(triple);
         Collection<Variable> answerVariables = List.of(centralVariable);
 
         StarQuery query = new StarQuery("Requête étoile", rdfAtoms, answerVariables);
@@ -143,10 +143,10 @@ class StarQueryTest {
         Term predicate2 = termFactory.createOrGetLiteral("http://example.org/predicate2");
         Term object2 = termFactory.createOrGetLiteral("http://example.org/object2");
 
-        RDFAtom atom1 = new RDFAtom(centralVariable, predicate1, object1);
-        RDFAtom atom2 = new RDFAtom(centralVariable, predicate2, object2);
+        RDFTriple triple1 = new RDFTriple(centralVariable, predicate1, object1);
+        RDFTriple triple2 = new RDFTriple(centralVariable, predicate2, object2);
 
-        List<RDFAtom> rdfAtoms = List.of(atom1, atom2);
+        List<RDFTriple> rdfAtoms = List.of(triple1, triple2);
         Collection<Variable> answerVariables = List.of(centralVariable);
 
         // Création des requêtes
@@ -154,15 +154,15 @@ class StarQueryTest {
         StarQuery identicalQuery = new StarQuery("Requête étoile", rdfAtoms, answerVariables);
 
         // Cas où les rdfAtoms diffèrent
-        RDFAtom atom3 = new RDFAtom(centralVariable, predicate1, termFactory.createOrGetLiteral("http://example.org/object3"));
-        List<RDFAtom> differentRdfAtoms = List.of(atom1, atom3);
+        RDFTriple triple3 = new RDFTriple(centralVariable, predicate1, termFactory.createOrGetLiteral("http://example.org/object3"));
+        List<RDFTriple> differentRdfAtoms = List.of(triple1, triple3);
         StarQuery queryWithDifferentRdfAtoms = new StarQuery("Requête étoile", differentRdfAtoms, answerVariables);
 
         // Comparaison avec une requête ayant des answerVariables différentes
         Variable differentVariable = termFactory.createOrGetVariable("?y"); // Nouvelle variable réponse valide
-        RDFAtom atomWithDifferentVariable = new RDFAtom(differentVariable, predicate1, object1);
-        RDFAtom atomWithDifferentVariable2 = new RDFAtom(differentVariable, predicate2, object2);
-        List<RDFAtom> rdfAtomsWithDifferentVariable = List.of(atomWithDifferentVariable, atomWithDifferentVariable2);
+        RDFTriple tripleWithDifferentVariable = new RDFTriple(differentVariable, predicate1, object1);
+        RDFTriple tripleWithDifferentVariable2 = new RDFTriple(differentVariable, predicate2, object2);
+        List<RDFTriple> rdfAtomsWithDifferentVariable = List.of(tripleWithDifferentVariable, tripleWithDifferentVariable2);
         Collection<Variable> differentAnswerVariables = List.of(differentVariable);
         StarQuery queryWithDifferentAnswerVariables = new StarQuery("Requête étoile différente", rdfAtomsWithDifferentVariable, differentAnswerVariables);
 
@@ -189,10 +189,10 @@ class StarQueryTest {
         Term object2 = termFactory.createOrGetLiteral("http://example.org/object2");
 
         // Création des RDFAtoms
-        RDFAtom atom1 = new RDFAtom(centralVariable, predicate1, object1);
-        RDFAtom atom2 = new RDFAtom(centralVariable, predicate2, object2);
+        RDFTriple triple1 = new RDFTriple(centralVariable, predicate1, object1);
+        RDFTriple triple2 = new RDFTriple(centralVariable, predicate2, object2);
 
-        List<RDFAtom> rdfAtoms = List.of(atom1, atom2);
+        List<RDFTriple> rdfAtoms = List.of(triple1, triple2);
         Collection<Variable> answerVariables = List.of(centralVariable);
 
         // Création de la requête étoile
@@ -207,11 +207,11 @@ class StarQueryTest {
 
         // Vérifier que la conjonction contient les RDFAtoms correctement
         FOFormulaConjunction conjunction = foQuery.getFormula();
-        assertEquals(2, conjunction.asAtomSet().size(), "La conjonction doit contenir deux atomes.");
+        assertEquals(2, conjunction.asAtomSet().size(), "La conjonction doit contenir deux triplets.");
 
         // Vérification des termes dans la conjonction
-        assertTrue(conjunction.asAtomSet().contains(atom1), "La conjonction doit contenir atom1.");
-        assertTrue(conjunction.asAtomSet().contains(atom2), "La conjonction doit contenir atom2.");
+        assertTrue(conjunction.asAtomSet().contains(triple1), "La conjonction doit contenir triple1.");
+        assertTrue(conjunction.asAtomSet().contains(triple2), "La conjonction doit contenir triple2.");
 
         // Vérification des variables de réponse
         assertEquals(answerVariables, foQuery.getAnswerVariables(), "Les variables de réponse doivent être les mêmes que celles de la requête étoile.");

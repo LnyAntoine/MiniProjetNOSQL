@@ -1,14 +1,11 @@
 package qengine.storage;
 
 import fr.boreal.model.logicalElements.api.*;
-import fr.boreal.model.logicalElements.impl.SubstitutionImpl;
 import org.apache.commons.lang3.NotImplementedException;
-import qengine.model.RDFAtom;
+import qengine.model.RDFTriple;
 import qengine.model.StarQuery;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Implémentation d'un HexaStore pour stocker des RDFAtom.
@@ -18,7 +15,7 @@ import java.util.stream.Stream;
  */
 public class RDFHexaStore implements RDFStorage {
     @Override
-    public boolean add(RDFAtom atom) {
+    public boolean add(RDFTriple triple) {
         throw new NotImplementedException();
     }
 
@@ -28,7 +25,7 @@ public class RDFHexaStore implements RDFStorage {
     }
 
     @Override
-    public Iterator<Substitution> match(RDFAtom atom) {
+    public Iterator<Substitution> match(RDFTriple triple) {
         throw new NotImplementedException();
     }
 
@@ -38,7 +35,12 @@ public class RDFHexaStore implements RDFStorage {
     }
 
     @Override
-    public Collection<RDFAtom> getAtoms() {
+    public long howMany(RDFTriple triple) {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public Collection<RDFTriple> getAtoms() {
         throw new NotImplementedException();
     }
 }
