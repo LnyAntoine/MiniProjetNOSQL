@@ -95,8 +95,6 @@ public class RDFHexaStore extends Dictionnaire implements RDFStorage {
         SPO.get(o).put(p,set);
     }
 
-
-
     @Override
     public boolean add(RDFTriple triple) {
         triple = this.encode(triple);
@@ -106,10 +104,16 @@ public class RDFHexaStore extends Dictionnaire implements RDFStorage {
         if (storage.contains(triple)) {
             return false;
         }
-        Integer s = 0;
-        Integer o = 0;
-        Integer p = 0;
+        Integer s = Integer.parseInt(triple.getTerms()[0].label());
+        Integer o = Integer.parseInt(triple.getTerms()[1].label());
+        Integer p = Integer.parseInt(triple.getTerms()[2].label());
 
+        addSPO(s, o, p);
+        addPOS(s, o, p);
+        addSOP(s, o, p);
+        addOPS(s, o, p);
+        addOSP(s, o, p);
+        addPSO(s, o, p);
 
         return true;
     }
