@@ -39,6 +39,63 @@ public class RDFHexaStore extends Dictionnaire implements RDFStorage {
         set.add(o);
         SPO.get(s).put(p,set);
     }
+    public void addSOP(Integer s, Integer o, Integer p) {
+        if (!SPO.containsKey(s)) {
+            SPO.put(s,new HashMap<>());
+        }
+        if (!SPO.get(s).containsKey(o)){
+            SPO.get(s).put(p,new HashSet<>());
+        }
+        Set<Integer> set = SPO.get(s).get(o);
+        set.add(p);
+        SPO.get(s).put(o,set);
+    }
+    public void addPOS(Integer s, Integer o, Integer p) {
+        if (!SPO.containsKey(p)) {
+            SPO.put(p,new HashMap<>());
+        }
+        if (!SPO.get(p).containsKey(o)){
+            SPO.get(p).put(o,new HashSet<>());
+        }
+        Set<Integer> set = SPO.get(p).get(o);
+        set.add(s);
+        SPO.get(p).put(o,set);
+    }
+    public void addPSO(Integer s, Integer o, Integer p) {
+        if (!SPO.containsKey(p)) {
+            SPO.put(p,new HashMap<>());
+        }
+        if (!SPO.get(p).containsKey(s)){
+            SPO.get(p).put(s,new HashSet<>());
+        }
+        Set<Integer> set = SPO.get(p).get(s);
+        set.add(o);
+        SPO.get(p).put(s,set);
+    }
+    public void addOSP(Integer s, Integer o, Integer p) {
+        if (!SPO.containsKey(o)) {
+            SPO.put(o,new HashMap<>());
+        }
+        if (!SPO.get(o).containsKey(s)){
+            SPO.get(o).put(s,new HashSet<>());
+        }
+        Set<Integer> set = SPO.get(o).get(s);
+        set.add(p);
+        SPO.get(o).put(s,set);
+    }
+    public void addOPS(Integer s, Integer o, Integer p) {
+        if (!SPO.containsKey(o)) {
+            SPO.put(o,new HashMap<>());
+        }
+        if (!SPO.get(o).containsKey(p)){
+            SPO.get(o).put(p,new HashSet<>());
+        }
+        Set<Integer> set = SPO.get(o).get(p);
+        set.add(s);
+        SPO.get(o).put(p,set);
+    }
+
+
 
     @Override
     public boolean add(RDFTriple triple) {

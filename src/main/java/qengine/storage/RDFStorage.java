@@ -21,6 +21,7 @@ public interface RDFStorage {
      */
     boolean add(RDFTriple t);
 
+
     /**
      * @param a atom
      * @return un itérateur de substitutions correspondant aux match des atomes
