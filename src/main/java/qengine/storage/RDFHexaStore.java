@@ -28,6 +28,18 @@ public class RDFHexaStore extends Dictionnaire implements RDFStorage {
         storage = new ArrayList<>();
     }
 
+    public void addSPO(Integer s, Integer o, Integer p) {
+        if (!SPO.containsKey(s)) {
+            SPO.put(s,new HashMap<>());
+        }
+        if (!SPO.get(s).containsKey(p)){
+            SPO.get(s).put(p,new HashSet<>());
+        }
+        Set<Integer> set = SPO.get(s).get(p);
+        set.add(o);
+        SPO.get(s).put(p,set);
+    }
+
     @Override
     public boolean add(RDFTriple triple) {
         triple = this.encode(triple);
@@ -37,7 +49,10 @@ public class RDFHexaStore extends Dictionnaire implements RDFStorage {
         if (storage.contains(triple)) {
             return false;
         }
-        storage.add(triple);
+        Integer s = 0;
+        Integer o = 0;
+        Integer p = 0;
+
 
         return true;
     }
