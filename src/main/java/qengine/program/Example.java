@@ -44,6 +44,7 @@ public final class Example {
 		FactBase factBase = new SimpleInMemoryGraphStore();
 		for (RDFTriple triple : rdfAtoms) {
 			factBase.add(triple);  // Stocker chaque RDFAtom dans le store
+
 		}
 
 		// Exécuter les requêtes sur le store

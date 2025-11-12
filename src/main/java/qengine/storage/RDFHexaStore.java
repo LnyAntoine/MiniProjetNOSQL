@@ -13,10 +13,33 @@ import java.util.*;
  * Les index sont basés sur les combinaisons (Sujet, Prédicat, Objet), (Sujet, Objet, Prédicat),
  * (Prédicat, Sujet, Objet), (Prédicat, Objet, Sujet), (Objet, Sujet, Prédicat) et (Objet, Prédicat, Sujet).
  */
-public class RDFHexaStore implements RDFStorage {
+public class RDFHexaStore extends Dictionnaire implements RDFStorage {
+    private List<RDFTriple> storage;
+    private Map<Integer,Map<Integer,Set<Integer>>> SPO;
+    private Map<Integer,Map<Integer,Set<Integer>>> SOP;
+    private Map<Integer,Map<Integer,Set<Integer>>> PSO;
+    private Map<Integer,Map<Integer,Set<Integer>>> POS;
+    private Map<Integer,Map<Integer,Set<Integer>>> OSP;
+    private Map<Integer,Map<Integer,Set<Integer>>> OPS;
+
+    public RDFHexaStore() {
+        tableEncodage = new HashMap<>();
+        tableDecodage = new HashMap<>();
+        storage = new ArrayList<>();
+    }
+
     @Override
     public boolean add(RDFTriple triple) {
-        throw new NotImplementedException();
+        triple = this.encode(triple);
+        if (triple==null) {
+            return false;
+        }
+        if (storage.contains(triple)) {
+            return false;
+        }
+        storage.add(triple);
+
+        return true;
     }
 
     @Override

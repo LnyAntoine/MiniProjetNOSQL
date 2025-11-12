@@ -28,7 +28,6 @@ public interface RDFStorage {
      */
     Iterator<Substitution> match(RDFTriple a);
 
-
     /**
      * @param q star query
      * @return an itérateur de subsitutions décrivrant les réponses à la requete
