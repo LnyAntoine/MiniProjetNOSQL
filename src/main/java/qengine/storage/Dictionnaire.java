@@ -1,6 +1,7 @@
 package qengine.storage;
 
 import fr.boreal.model.logicalElements.api.Term;
+import fr.boreal.model.logicalElements.impl.LiteralImpl;
 import fr.boreal.model.logicalElements.impl.VariableImpl;
 import qengine.model.RDFTriple;
 
@@ -21,9 +22,9 @@ public abstract class Dictionnaire {
             }
         }
         return new RDFTriple(
-                new VariableImpl(getEncodage(triple.getTerms()[0])),
-                new VariableImpl(getEncodage(triple.getTerms()[1])),
-                new VariableImpl(getEncodage(triple.getTerms()[2]))
+                new LiteralImpl<String>(getEncodage(triple.getTerms()[0])),
+                new LiteralImpl<String>(getEncodage(triple.getTerms()[1])),
+                new LiteralImpl<String>(getEncodage(triple.getTerms()[2]))
         );
     }
     protected String getEncodage(String label) {

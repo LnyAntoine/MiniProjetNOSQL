@@ -1,6 +1,8 @@
 package qengine.storage;
 
 import fr.boreal.model.logicalElements.api.*;
+import fr.boreal.model.logicalElements.factory.api.TermFactory;
+import fr.boreal.model.logicalElements.factory.impl.SameObjectTermFactory;
 import org.apache.commons.lang3.NotImplementedException;
 import qengine.model.RDFTriple;
 import qengine.model.StarQuery;
@@ -125,6 +127,9 @@ public class RDFHexaStore extends Dictionnaire implements RDFStorage {
 
     @Override
     public Iterator<Substitution> match(RDFTriple triple) {
+        TermFactory f = SameObjectTermFactory.instance();
+        Variable variable = f.createOrGetVariable(triple.getTerms()[0].label());
+
         throw new NotImplementedException();
     }
 
