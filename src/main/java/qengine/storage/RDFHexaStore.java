@@ -106,6 +106,7 @@ public class RDFHexaStore extends Dictionnaire implements RDFStorage {
         if (storage.contains(triple)) {
             return false;
         }
+
         Integer s = Integer.parseInt(triple.getTerms()[0].label());
         Integer o = Integer.parseInt(triple.getTerms()[1].label());
         Integer p = Integer.parseInt(triple.getTerms()[2].label());

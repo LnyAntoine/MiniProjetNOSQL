@@ -49,8 +49,8 @@ public class GiantTableStore extends Dictionnaire implements RDFStorage{
         for (int i = 0;i<3;i++){
             Term term = request.getTerm(i);
             Term term2 = triple.getTerm(i);
-            if (term instanceof Variable var) {
-                s.add(var,term2);
+            if (term.isVariable()) {
+                s.add( (Variable) term,term2);
             } else return null;
         }
         return s;

@@ -9,39 +9,39 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public abstract class Dictionnaire {
-    protected HashMap<String, String> tableEncodage;
-    protected HashMap<String, String> tableDecodage;
+    protected HashMap<String, Integer> tableEncodage;
+    protected HashMap<Integer, String> tableDecodage;
     protected RDFTriple encode(RDFTriple triple) {
         for (Term term  : triple.getTerms()){
             if (!tableEncodage.containsKey(term.label())){
                 if (!tableDecodage.containsKey(tableEncodage.size())){
-                    tableEncodage.put(term.label(), ""+tableEncodage.size());
-                    tableDecodage.put(""+tableEncodage.size(), term.label());
+                    tableEncodage.put(term.label(),tableEncodage.size());
+                    tableDecodage.put(tableEncodage.size(), term.label());
                 }
                 return null;
             }
         }
         return new RDFTriple(
-                new LiteralImpl<String>(getEncodage(triple.getTerms()[0])),
-                new LiteralImpl<String>(getEncodage(triple.getTerms()[1])),
-                new LiteralImpl<String>(getEncodage(triple.getTerms()[2]))
+                new LiteralImpl<Integer>(getEncodage(triple.getTerms()[0])),
+                new LiteralImpl<Integer>(getEncodage(triple.getTerms()[1])),
+                new LiteralImpl<Integer>(getEncodage(triple.getTerms()[2]))
         );
     }
-    protected String getEncodage(String label) {
+    protected Integer getEncodage(String label) {
         return tableEncodage.get(label);
     }
 
-    protected String getEncodage(Term term) {
+    protected Integer getEncodage(Term term) {
         String label = term.label();
         return tableEncodage.get(label);
     }
 
-    protected String getDecodage(String value) {
+    protected String getDecodage(Integer value) {
         return tableDecodage.get(value);
     }
 
     protected String getDecodage(Term term) {
-        String label = term.label();
+        Integer label = Integer.parseInt(term.label());
         return tableDecodage.get(label);
     }
 
