@@ -128,7 +128,6 @@ public class RDFHexaStore implements RDFStorage {
 
     @Override
     public Iterator<Substitution> match(RDFTriple triple) {
-        ArrayList<Substitution> returnedList = new ArrayList<>();
         Term s = triple.getTerm(0);
         Term p = triple.getTerm(1);
         Term o = triple.getTerm(2);
