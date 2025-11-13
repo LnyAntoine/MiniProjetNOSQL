@@ -53,4 +53,9 @@ public class Dictionnaire {
         return tableDecodage.get(label);
     }
 
+    protected Term getDecodageAsTerm(Integer value)
+    {
+        String label = getDecodage(value);
+        return new LiteralImpl<>(label);
+    }
 }
