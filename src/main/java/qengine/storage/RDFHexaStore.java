@@ -128,8 +128,39 @@ public class RDFHexaStore extends Dictionnaire implements RDFStorage {
 
     @Override
     public Iterator<Substitution> match(RDFTriple triple) {
-        TermFactory f = SameObjectTermFactory.instance();
-        Variable variable = f.createOrGetVariable(triple.getTerms()[0].label());
+        ArrayList<Substitution> returnedList = new ArrayList<>();
+        Term s = triple.getTerm(0);
+        Term p = triple.getTerm(1);
+        Term o = triple.getTerm(2);
+        ArrayList<Substitution> substitutions = new ArrayList<>();
+
+        //Cas de base requete vide ou "pleine"
+        if (s.isVariable() && p.isVariable() && o.isVariable()) {
+            //Va tout demander ?
+            return substitutions.iterator();
+        }
+        else if (!s.isVariable() && !p.isVariable() && !o.isVariable()) {
+            //Pas une requete ?
+            return substitutions.iterator();
+        }
+
+        if (!s.isVariable()) {
+            //Match dans S..
+            if (!o.isVariable()) { //S littéral, O littéral, P doit etre variable
+                //Match SOP
+            }
+            else { //Si S est littéral O est variable, P est donc litteral (sinn géré pas cas de base)
+                //Match SPO
+            }
+        } else {
+            if (!o.isVariable()) { // S est variable, O est littéral, P peut etre littéral ou variable
+                //Match dans OPS
+            }
+            else { //S est variable, O est variable, p doit etre littéral
+                //Match PSO
+            }
+        }
+
 
         throw new NotImplementedException();
     }
