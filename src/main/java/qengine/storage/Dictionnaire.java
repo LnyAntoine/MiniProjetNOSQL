@@ -8,7 +8,7 @@ import qengine.model.RDFTriple;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public abstract class Dictionnaire {
+public class Dictionnaire {
     protected HashMap<String, Integer> tableEncodage;
     protected HashMap<Integer, String> tableDecodage;
     protected RDFTriple encode(RDFTriple triple) {
@@ -27,6 +27,14 @@ public abstract class Dictionnaire {
                 new LiteralImpl<Integer>(getEncodage(triple.getTerms()[2]))
         );
     }
+
+    protected RDFTriple decode(RDFTriple triple) {
+        LiteralImpl<String> s = new LiteralImpl<String>(getDecodage(triple.getTerms()[0]));
+        LiteralImpl<String> p = new LiteralImpl<String>(getDecodage(triple.getTerms()[1]));
+        LiteralImpl<String> o = new LiteralImpl<String>(getDecodage(triple.getTerms()[2]));
+        return new RDFTriple(s, p, o);
+    }
+
     protected Integer getEncodage(String label) {
         return tableEncodage.get(label);
     }

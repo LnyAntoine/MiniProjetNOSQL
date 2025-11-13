@@ -14,14 +14,18 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-public class GiantTableStore extends Dictionnaire implements RDFStorage{
+public class GiantTableStore implements RDFStorage{
     private List<RDFTriple> storage;
+    private Dictionnaire dictionnaire;
+
     public GiantTableStore() {
+        dictionnaire = new Dictionnaire();
         storage = new ArrayList<>();
     }
+
     @Override
     public boolean add(RDFTriple triple) {
-        triple = this.encode(triple);
+        triple = dictionnaire.encode(triple);
         if (triple==null) {
             return false;
         }

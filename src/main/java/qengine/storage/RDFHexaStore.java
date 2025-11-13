@@ -15,7 +15,7 @@ import java.util.*;
  * Les index sont basés sur les combinaisons (Sujet, Prédicat, Objet), (Sujet, Objet, Prédicat),
  * (Prédicat, Sujet, Objet), (Prédicat, Objet, Sujet), (Objet, Sujet, Prédicat) et (Objet, Prédicat, Sujet).
  */
-public class RDFHexaStore extends Dictionnaire implements RDFStorage {
+public class RDFHexaStore implements RDFStorage {
     private List<RDFTriple> storage;
     private Map<Integer,Map<Integer,Set<Integer>>> SPO;
     private Map<Integer,Map<Integer,Set<Integer>>> SOP;
@@ -23,11 +23,11 @@ public class RDFHexaStore extends Dictionnaire implements RDFStorage {
     private Map<Integer,Map<Integer,Set<Integer>>> POS;
     private Map<Integer,Map<Integer,Set<Integer>>> OSP;
     private Map<Integer,Map<Integer,Set<Integer>>> OPS;
+    private Dictionnaire dictionnaire;
 
     public RDFHexaStore() {
-        tableEncodage = new HashMap<>();
-        tableDecodage = new HashMap<>();
         storage = new ArrayList<>();
+        dictionnaire = new Dictionnaire();
     }
 
     public void addSPO(Integer s, Integer o, Integer p) {
@@ -99,7 +99,7 @@ public class RDFHexaStore extends Dictionnaire implements RDFStorage {
 
     @Override
     public boolean add(RDFTriple triple) {
-        triple = this.encode(triple);
+        triple = dictionnaire.encode(triple);
         if (triple==null) {
             return false;
         }
