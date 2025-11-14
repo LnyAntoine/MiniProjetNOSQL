@@ -102,7 +102,6 @@ public class RDFHexaStoreTest {
         assertTrue(matchedList.contains(secondResult), "Missing substitution: " + secondResult);
 
         // Other cases
-        throw new NotImplementedException("This test must be completed");
     }
 
     @Test

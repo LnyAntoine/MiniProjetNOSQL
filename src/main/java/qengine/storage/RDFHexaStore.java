@@ -214,9 +214,9 @@ public class RDFHexaStore implements RDFStorage {
                 for (Integer io : SPO.get(is).get(ip)) {
                     //SameObjectTermFactory.instance().createOrGetLiteral();
                     RDFTriple triple = new RDFTriple(
-                            utils.createLiteralFromObject(dictionnaire.getDecodageAsTerm(is)),
-                            utils.createLiteralFromObject(dictionnaire.getDecodageAsTerm(ip)),
-                            utils.createLiteralFromObject(dictionnaire.getDecodageAsTerm(io))
+                            dictionnaire.getDecodageAsTerm(is),
+                            dictionnaire.getDecodageAsTerm(ip),
+                            dictionnaire.getDecodageAsTerm(io)
                     );
                     atoms.add(triple);
                 }

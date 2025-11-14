@@ -1,10 +1,13 @@
 package qengine.storage;
 
+import fr.boreal.model.logicalElements.api.Literal;
 import fr.boreal.model.logicalElements.api.Term;
 import fr.boreal.model.logicalElements.impl.LiteralImpl;
 import qengine.model.RDFTriple;
 
 import java.util.HashMap;
+
+import static qengine.utils.createLiteralFromObject;
 
 public class Dictionnaire {
     protected HashMap<String, Integer> tableEncodage;
@@ -18,13 +21,13 @@ public class Dictionnaire {
     protected RDFTriple encodeTripleQuery(RDFTriple triple) {
         encode(triple);
         Term sEncoded = triple.getTerm(0).isLiteral()
-                ? new LiteralImpl<Integer>(getEncodage(triple.getTerm(0)))
+                ? createLiteralFromObject(getEncodage(triple.getTerm(0)))
                 : triple.getTerm(0);
         Term pEncoded = triple.getTerm(1).isLiteral()
-                ? new LiteralImpl<Integer>(getEncodage(triple.getTerm(1)))
+                ? createLiteralFromObject(getEncodage(triple.getTerm(1)))
                 : triple.getTerm(1);
         Term oEncoded = triple.getTerm(2).isLiteral()
-                ? new LiteralImpl<Integer>(getEncodage(triple.getTerm(2)))
+                ? createLiteralFromObject(getDecodage(triple.getTerms()[2]))
                 : triple.getTerm(2);
 
         return new RDFTriple(sEncoded, pEncoded, oEncoded);
@@ -53,9 +56,13 @@ public class Dictionnaire {
     }
 
     protected RDFTriple decode(RDFTriple triple) {
-        LiteralImpl<String> s = new LiteralImpl<String>(getDecodage(triple.getTerms()[0]));
-        LiteralImpl<String> p = new LiteralImpl<String>(getDecodage(triple.getTerms()[1]));
-        LiteralImpl<String> o = new LiteralImpl<String>(getDecodage(triple.getTerms()[2]));
+        Literal<String> s =
+                (Literal<String>) createLiteralFromObject(getDecodage(triple.getTerms()[0]));
+        Literal<String> p =
+                (Literal<String>) createLiteralFromObject(getDecodage(triple.getTerms()[1]));
+        Literal<String> o =
+                (Literal<String>) createLiteralFromObject(getDecodage(triple.getTerms()[2]));
+
         return new RDFTriple(s, p, o);
     }
 
@@ -80,11 +87,11 @@ public class Dictionnaire {
     protected Term getDecodageAsTerm(Integer value)
     {
         String label = getDecodage(value);
-        return !label.isEmpty() ? new LiteralImpl<String>(label): null;
+        return !label.isEmpty() ? createLiteralFromObject(label): null;
     }
     protected Term getEncodageAsTerm(String label)
     {
         Integer value = getEncodage(label);
-        return value != -1 ? new LiteralImpl<Integer>(value): null;
+        return value != -1 ? createLiteralFromObject(value): null;
     }
 }
