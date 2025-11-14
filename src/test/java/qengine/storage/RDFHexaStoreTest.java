@@ -60,7 +60,25 @@ public class RDFHexaStoreTest {
 
     @Test
     public void testAddRDFAtom() {
-        throw new NotImplementedException();
+        RDFHexaStore store = new RDFHexaStore();
+
+        // Version stream
+        // Ajouter plusieurs RDFAtom
+        RDFTriple rdfAtom1 = new RDFTriple(SUBJECT_1, PREDICATE_1, OBJECT_1);
+        RDFTriple rdfAtom2 = new RDFTriple(SUBJECT_2, PREDICATE_2, OBJECT_2);
+
+        assertTrue(store.add(rdfAtom1), "Le RDFAtom1 devrait être ajouté avec succès.");
+        assertTrue(store.add(rdfAtom2), "Le RDFAtom2 devrait être ajouté avec succès.");
+
+        // Vérifier que tous les atomes sont présents
+        Collection<RDFTriple> atoms = store.getAtoms();
+        System.out.println(atoms);
+        System.out.println(rdfAtom1);
+        System.out.println(rdfAtom2);
+
+        assertTrue(atoms.contains(rdfAtom1), "La base devrait contenir le premier RDFAtom ajouté.");
+        assertTrue(atoms.contains(rdfAtom2), "La base devrait contenir le second RDFAtom ajouté.");
+
     }
 
     @Test
