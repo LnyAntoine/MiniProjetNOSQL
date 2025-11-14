@@ -10,6 +10,11 @@ public class Dictionnaire {
     protected HashMap<String, Integer> tableEncodage;
     protected HashMap<Integer, String> tableDecodage;
 
+    public Dictionnaire() {
+        tableEncodage = new HashMap<>();
+        tableDecodage = new HashMap<>();
+    }
+
     protected RDFTriple encodeTripleQuery(RDFTriple triple) {
         encode(triple);
         Term sEncoded = triple.getTerm(0).isLiteral()
