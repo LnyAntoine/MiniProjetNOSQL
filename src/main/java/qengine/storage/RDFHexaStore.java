@@ -1,9 +1,6 @@
 package qengine.storage;
 
 import fr.boreal.model.logicalElements.api.*;
-import fr.boreal.model.logicalElements.factory.api.TermFactory;
-import fr.boreal.model.logicalElements.factory.impl.SameObjectTermFactory;
-import fr.boreal.model.logicalElements.impl.LiteralImpl;
 import fr.boreal.model.logicalElements.impl.SubstitutionImpl;
 import org.apache.commons.lang3.NotImplementedException;
 import qengine.model.RDFTriple;
@@ -18,7 +15,6 @@ import java.util.*;
  * (Prédicat, Sujet, Objet), (Prédicat, Objet, Sujet), (Objet, Sujet, Prédicat) et (Objet, Prédicat, Sujet).
  */
 public class RDFHexaStore implements RDFStorage {
-    private List<RDFTriple> storage;
     private Map<Integer,Map<Integer,Set<Integer>>> SPO;
     private Map<Integer,Map<Integer,Set<Integer>>> SOP;
     private Map<Integer,Map<Integer,Set<Integer>>> PSO;
@@ -28,7 +24,6 @@ public class RDFHexaStore implements RDFStorage {
     private Dictionnaire dictionnaire;
 
     public RDFHexaStore() {
-        storage = new ArrayList<>();
         dictionnaire = new Dictionnaire();
     }
 
@@ -105,7 +100,16 @@ public class RDFHexaStore implements RDFStorage {
         if (triple==null) {
             return false;
         }
-        if (storage.contains(triple)) {
+
+        if (triple.getTerm(0)==null ||
+            triple.getTerm(1)==null ||
+            triple.getTerm(2)==null) {
+            return false;
+        }
+
+        if (triple.getTerm(0).isVariable() ||
+            triple.getTerm(1).isVariable() ||
+            triple.getTerm(2).isVariable()) {
             return false;
         }
 
@@ -123,118 +127,34 @@ public class RDFHexaStore implements RDFStorage {
         return true;
     }
 
-    public ArrayList<Substitution> matchSPO(Term s, Term p, Term o){
-        ArrayList<Substitution> substitutions = new ArrayList<>();
-       Map<Integer, Set<Integer>> po_hashmap =  SPO.get(Integer.parseInt(s.label()));
-       if (p.isLiteral()) {
-           Set<Integer> o_set = po_hashmap.get(Integer.parseInt(p.label()));
-           for (Integer i : o_set) {
-               Substitution sub = new SubstitutionImpl();
-               sub.add((Variable) o, dictionnaire.getDecodageAsTerm(i));
-               substitutions.add(sub);
-           }
-       }else{
-           for (Integer ip: po_hashmap.keySet()) {
-               Set<Integer> o_set = po_hashmap.get(ip);
-               for (Integer io : o_set) {
-                   Substitution sub = new SubstitutionImpl();
-                   sub.add((Variable) p, dictionnaire.getDecodageAsTerm(ip));
-                   sub.add((Variable) o, dictionnaire.getDecodageAsTerm(io));
-                   substitutions.add(sub);
-               }
-           }
-       }
-        return substitutions;
-    }
-    public ArrayList<Substitution> matchSOP(Term s, Term p, Term o){
-        ArrayList<Substitution> substitutions = new ArrayList<>();
-        Map<Integer, Set<Integer>> op_hashmap =  SOP.get(Integer.parseInt(s.label()));
-        if (o.isLiteral()) {
-            Set<Integer> p_set = op_hashmap.get(Integer.parseInt(o.label()));
-            for (Integer i : p_set) {
-                Substitution sub = new SubstitutionImpl();
-                sub.add((Variable) p, dictionnaire.getDecodageAsTerm(i));
-                substitutions.add(sub);
-            }
-        }else{
-            for (Integer io: op_hashmap.keySet()) {
-                Set<Integer> o_set = op_hashmap.get(io);
-                for (Integer ip : o_set) {
-                    Substitution sub = new SubstitutionImpl();
-                    sub.add((Variable) o, dictionnaire.getDecodageAsTerm(io));
-                    sub.add((Variable) p, dictionnaire.getDecodageAsTerm(ip));
-                    substitutions.add(sub);
-                }
-            }
-        }
-        return substitutions;
-    }
-
-    public ArrayList<Substitution> matchOPS(Term s, Term p, Term o){
-        ArrayList<Substitution> substitutions = new ArrayList<>();
-        Map<Integer, Set<Integer>> ps_hashmap =  OPS.get(Integer.parseInt(o.label()));
-        if (p.isLiteral()) {
-            Set<Integer> s_set = ps_hashmap.get(Integer.parseInt(p.label()));
-            for (Integer i : s_set) {
-                Substitution sub = new SubstitutionImpl();
-                sub.add((Variable) s, dictionnaire.getDecodageAsTerm(i));
-                substitutions.add(sub);
-            }
-        }else{
-            for (Integer ip: ps_hashmap.keySet()) {
-                Set<Integer> s_set = ps_hashmap.get(ip);
-                for (Integer is : s_set) {
-                    Substitution sub = new SubstitutionImpl();
-                    sub.add((Variable) p, dictionnaire.getDecodageAsTerm(ip));
-                    sub.add((Variable) s, dictionnaire.getDecodageAsTerm(is));
-                    substitutions.add(sub);
-                }
-            }
-        }
-        return substitutions;
-    }
-
-
-    public ArrayList<Substitution> matchPSO(Term s, Term p, Term o){
-        ArrayList<Substitution> substitutions = new ArrayList<>();
-        Map<Integer, Set<Integer>> so_hashmap =  PSO.get(Integer.parseInt(p.label()));
-        if (s.isLiteral()) {
-            Set<Integer> o_set = so_hashmap.get(Integer.parseInt(s.label()));
-            for (Integer i : o_set) {
-                Substitution sub = new SubstitutionImpl();
-                sub.add((Variable) o, dictionnaire.getDecodageAsTerm(i));
-                substitutions.add(sub);
-            }
-        }else{
-            for (Integer is: so_hashmap.keySet()) {
-                Set<Integer> o_set = so_hashmap.get(is);
-                for (Integer io : o_set) {
-                    Substitution sub = new SubstitutionImpl();
-                    sub.add((Variable) s, dictionnaire.getDecodageAsTerm(is));
-                    sub.add((Variable) o, dictionnaire.getDecodageAsTerm(io));
-                    substitutions.add(sub);
-                }
-            }
-        }
-        return substitutions;
-    }
     @Override
     public long size() {
-        throw new NotImplementedException();
+        if (checkSynchronization()) return SPO.size();
+        else return -1;
     }
 
     @Override
     public Iterator<Substitution> match(RDFTriple triple) {
-        triple = dictionnaire.encode(triple);
+        ArrayList<Substitution> substitutions = new ArrayList<>();
+
+        if (triple==null) {
+            return substitutions.iterator();
+        }
+        if (triple.getTerm(0)==null ||
+            triple.getTerm(1)==null ||
+            triple.getTerm(2)==null) {
+            return substitutions.iterator();
+        }
+
+        triple = dictionnaire.encodeTripleQuery(triple);
         Term s = triple.getTerm(0);
         Term p = triple.getTerm(1);
         Term o = triple.getTerm(2);
-        ArrayList<Substitution> substitutions = new ArrayList<>();
 
         //Cas de base requete vide ou "pleine"
         if (s.isVariable() && p.isVariable() && o.isVariable()) {
             //Va tout demander ?
-            return substitutions.iterator();
+            return matchAll(s,p,o).iterator();
         }
         else if (!s.isVariable() && !p.isVariable() && !o.isVariable()) {
             //Pas une requete ?
@@ -251,9 +171,11 @@ public class RDFHexaStore implements RDFStorage {
                 substitutions = matchSPO(s, p, o);
             }
         } else {
-            if (!o.isVariable()) { // S est variable, O est littéral, P peut etre littéral ou variable
-                substitutions = matchOPS(s, p, o);            }
-            else { //S est variable, O est variable, p doit etre littéral
+            if (!o.isVariable()) {
+                // S est variable, O est littéral, P peut etre littéral donc OPS
+                substitutions = matchOPS(s, p, o);
+            }
+            else { //S est variable, O est variable, p doit etre littéral donc PSO
                 substitutions = matchPSO(s, p, o);            }
         }
         return substitutions.iterator();
@@ -273,4 +195,197 @@ public class RDFHexaStore implements RDFStorage {
     public Collection<RDFTriple> getAtoms() {
         throw new NotImplementedException();
     }
+
+    private ArrayList<Substitution> matchAll(Term s, Term p, Term o){;
+        ArrayList<Substitution> substitutions = new ArrayList<>();
+        if (!s.isVariable() || !p.isVariable() || !o.isVariable()) {
+            return substitutions;
+        }
+        for (Integer is : SPO.keySet()) {
+            Map<Integer, Set<Integer>> po_hashmap = SPO.get(is);
+            for (Integer ip : po_hashmap.keySet()) {
+                Set<Integer> o_set = po_hashmap.get(ip);
+                for (Integer io : o_set) {
+                    Substitution sub = new SubstitutionImpl();
+                    sub.add((Variable) s, dictionnaire.getDecodageAsTerm(is));
+                    sub.add((Variable) p, dictionnaire.getDecodageAsTerm(ip));
+                    sub.add((Variable) o, dictionnaire.getDecodageAsTerm(io));
+                    substitutions.add(sub);
+                }
+            }
+        }
+
+        return substitutions;
+    }
+
+    private ArrayList<Substitution> matchSPO(Term s, Term p, Term o){
+        ArrayList<Substitution> substitutions = new ArrayList<>();
+        if (s == null || p == null || o == null) {
+            return substitutions;
+        }
+        if (!s.isLiteral()) {
+            return substitutions;
+        }
+        Map<Integer, Set<Integer>> po_hashmap =
+                SPO.get(Integer.parseInt(s.label()))!=null
+                        ? SPO.get(Integer.parseInt(s.label()))
+                        : new HashMap<>();
+        if (SPO.isEmpty()) {
+            return substitutions;
+        }
+        if (p.isLiteral()) {
+            Set<Integer> o_set = po_hashmap.get(Integer.parseInt(p.label()))!=null
+                    ? po_hashmap.get(Integer.parseInt(p.label()))
+                    : new HashSet<>();
+            if (o_set.isEmpty()) {
+                return substitutions;
+            }
+            for (Integer i : o_set) {
+                Substitution sub = new SubstitutionImpl();
+                sub.add((Variable) o, dictionnaire.getDecodageAsTerm(i));
+                substitutions.add(sub);
+            }
+        }else{
+            for (Integer ip: po_hashmap.keySet()) {
+                Set<Integer> o_set = po_hashmap.get(ip);
+                for (Integer io : o_set) {
+                    Substitution sub = new SubstitutionImpl();
+                    sub.add((Variable) p, dictionnaire.getDecodageAsTerm(ip));
+                    sub.add((Variable) o, dictionnaire.getDecodageAsTerm(io));
+                    substitutions.add(sub);
+                }
+            }
+        }
+        return substitutions;
+    }
+
+    private ArrayList<Substitution> matchSOP(Term s, Term p, Term o){
+        ArrayList<Substitution> substitutions = new ArrayList<>();
+        if (s == null || p == null || o == null) {
+            return substitutions;
+        }
+        if (!s.isLiteral()) {
+            return substitutions;
+        }
+        Map<Integer, Set<Integer>> op_hashmap =  SOP.get(Integer.parseInt(s.label()))!=null?
+                SOP.get(Integer.parseInt(s.label()))
+                : new HashMap<>();
+        if (SOP.isEmpty()) {
+            return substitutions;
+        }
+        if (o.isLiteral()) {
+            Set<Integer> p_set = op_hashmap.get(Integer.parseInt(o.label()))!=null
+                    ? op_hashmap.get(Integer.parseInt(o.label()))
+                    : new HashSet<>();
+            if (p_set.isEmpty()) {
+                return substitutions;
+            }
+            for (Integer i : p_set) {
+                Substitution sub = new SubstitutionImpl();
+                sub.add((Variable) p, dictionnaire.getDecodageAsTerm(i));
+                substitutions.add(sub);
+            }
+        }else{
+            for (Integer io: op_hashmap.keySet()) {
+                Set<Integer> o_set = op_hashmap.get(io);
+                for (Integer ip : o_set) {
+                    Substitution sub = new SubstitutionImpl();
+                    sub.add((Variable) o, dictionnaire.getDecodageAsTerm(io));
+                    sub.add((Variable) p, dictionnaire.getDecodageAsTerm(ip));
+                    substitutions.add(sub);
+                }
+            }
+        }
+        return substitutions;
+    }
+
+    private ArrayList<Substitution> matchOPS(Term s, Term p, Term o){
+        ArrayList<Substitution> substitutions = new ArrayList<>();
+        if (o == null || p == null || s == null) {
+            return substitutions;
+        }
+        if (!o.isLiteral()) {
+            return substitutions;
+        }
+        Map<Integer, Set<Integer>> ps_hashmap =  OPS.get(Integer.parseInt(o.label()))!=null?
+                OPS.get(Integer.parseInt(o.label()))
+                : new HashMap<>();
+        if (OPS.isEmpty()) {
+            return substitutions;
+        }
+        if (p.isLiteral()) {
+            Set<Integer> s_set = ps_hashmap.get(Integer.parseInt(p.label()))!=null
+                    ? ps_hashmap.get(Integer.parseInt(p.label()))
+                    : new HashSet<>();
+            if (s_set.isEmpty()) {
+                return substitutions;
+            }
+            for (Integer i : s_set) {
+                Substitution sub = new SubstitutionImpl();
+                sub.add((Variable) s, dictionnaire.getDecodageAsTerm(i));
+                substitutions.add(sub);
+            }
+        }else{
+            for (Integer ip: ps_hashmap.keySet()) {
+                Set<Integer> s_set = ps_hashmap.get(ip);
+                for (Integer is : s_set) {
+                    Substitution sub = new SubstitutionImpl();
+                    sub.add((Variable) p, dictionnaire.getDecodageAsTerm(ip));
+                    sub.add((Variable) s, dictionnaire.getDecodageAsTerm(is));
+                    substitutions.add(sub);
+                }
+            }
+        }
+        return substitutions;
+    }
+
+    private ArrayList<Substitution> matchPSO(Term s, Term p, Term o){
+        ArrayList<Substitution> substitutions = new ArrayList<>();
+        if (p == null || s == null || o == null) {
+            return substitutions;
+        }
+        if (!p.isLiteral()) {
+            return substitutions;
+        }
+        Map<Integer, Set<Integer>> so_hashmap =
+                PSO.get(Integer.parseInt(p.label()))!=null
+                        ? PSO.get(Integer.parseInt(p.label()))
+                        : new HashMap<>();
+        if (PSO.isEmpty()) {
+            return substitutions;
+        }
+        if (s.isLiteral()) {
+            Set<Integer> o_set = so_hashmap.get(Integer.parseInt(s.label()))!=null
+                    ? so_hashmap.get(Integer.parseInt(s.label()))
+                    : new HashSet<>();
+            if (o_set.isEmpty()) {
+                return substitutions;
+            }
+            for (Integer i : o_set) {
+                Substitution sub = new SubstitutionImpl();
+                sub.add((Variable) o, dictionnaire.getDecodageAsTerm(i));
+                substitutions.add(sub);
+            }
+        }else{
+            for (Integer is: so_hashmap.keySet()) {
+                Set<Integer> o_set = so_hashmap.get(is);
+                for (Integer io : o_set) {
+                    Substitution sub = new SubstitutionImpl();
+                    sub.add((Variable) s, dictionnaire.getDecodageAsTerm(is));
+                    sub.add((Variable) o, dictionnaire.getDecodageAsTerm(io));
+                    substitutions.add(sub);
+                }
+            }
+        }
+        return substitutions;
+    }
+
+    private boolean checkSynchronization() {
+        return SPO.size()== POS.size() &&
+                SPO.size() == SOP.size() &&
+                SPO.size() == OPS.size() &&
+                SPO.size() == OSP.size() &&
+                SPO.size() == PSO.size();
+    }
+
 }

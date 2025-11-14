@@ -2,29 +2,48 @@ package qengine.storage;
 
 import fr.boreal.model.logicalElements.api.Term;
 import fr.boreal.model.logicalElements.impl.LiteralImpl;
-import fr.boreal.model.logicalElements.impl.VariableImpl;
 import qengine.model.RDFTriple;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Dictionnaire {
     protected HashMap<String, Integer> tableEncodage;
     protected HashMap<Integer, String> tableDecodage;
+
+    protected RDFTriple encodeTripleQuery(RDFTriple triple) {
+        encode(triple);
+        Term sEncoded = triple.getTerm(0).isLiteral()
+                ? new LiteralImpl<Integer>(getEncodage(triple.getTerm(0)))
+                : triple.getTerm(0);
+        Term pEncoded = triple.getTerm(1).isLiteral()
+                ? new LiteralImpl<Integer>(getEncodage(triple.getTerm(1)))
+                : triple.getTerm(1);
+        Term oEncoded = triple.getTerm(2).isLiteral()
+                ? new LiteralImpl<Integer>(getEncodage(triple.getTerm(2)))
+                : triple.getTerm(2);
+
+        return new RDFTriple(sEncoded, pEncoded, oEncoded);
+    }
+
     protected RDFTriple encode(RDFTriple triple) {
         for (Term term  : triple.getTerms()){
+            if (term.isVariable()) {
+                continue;
+            }
             if (!tableEncodage.containsKey(term.label())){
                 if (!tableDecodage.containsKey(tableEncodage.size())){
                     tableEncodage.put(term.label(),tableEncodage.size());
                     tableDecodage.put(tableEncodage.size(), term.label());
+                } else {
+                    //should not happen
+                    return null;
                 }
-                return null;
             }
         }
         return new RDFTriple(
-                new LiteralImpl<Integer>(getEncodage(triple.getTerms()[0])),
-                new LiteralImpl<Integer>(getEncodage(triple.getTerms()[1])),
-                new LiteralImpl<Integer>(getEncodage(triple.getTerms()[2]))
+                getEncodageAsTerm(triple.getTerms()[0].label()),
+                getEncodageAsTerm(triple.getTerms()[1].label()),
+                getEncodageAsTerm(triple.getTerms()[2].label())
         );
     }
 
@@ -36,26 +55,31 @@ public class Dictionnaire {
     }
 
     protected Integer getEncodage(String label) {
-        return tableEncodage.get(label);
+        return label.isEmpty() || tableEncodage.get(label)!=null ? tableEncodage.get(label) : -1;
     }
 
     protected Integer getEncodage(Term term) {
         String label = term.label();
-        return tableEncodage.get(label);
+        return label.isEmpty() || tableEncodage.get(label)!=null ? tableEncodage.get(label) : -1;
     }
 
     protected String getDecodage(Integer value) {
-        return tableDecodage.get(value);
+        return value == -1 || tableDecodage.get(value)!=null ? tableDecodage.get(value) : "";
     }
 
     protected String getDecodage(Term term) {
-        Integer label = Integer.parseInt(term.label());
-        return tableDecodage.get(label);
+        Integer value = Integer.parseInt(term.label());
+        return value == -1 || tableDecodage.get(value)!=null ? tableDecodage.get(value) : "";
     }
 
     protected Term getDecodageAsTerm(Integer value)
     {
         String label = getDecodage(value);
-        return new LiteralImpl<>(label);
+        return !label.isEmpty() ? new LiteralImpl<String>(label): null;
+    }
+    protected Term getEncodageAsTerm(String label)
+    {
+        Integer value = getEncodage(label);
+        return value != -1 ? new LiteralImpl<Integer>(value): null;
     }
 }
