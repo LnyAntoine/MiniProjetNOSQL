@@ -23,6 +23,7 @@ public class RDFHexaStore implements RDFStorage {
     private Map<Integer,Map<Integer,Set<Integer>>> OPS;
     private Dictionnaire dictionnaire;
 
+
     public RDFHexaStore() {
         dictionnaire = new Dictionnaire();
         SPO = new HashMap<>();
@@ -45,59 +46,59 @@ public class RDFHexaStore implements RDFStorage {
         SPO.get(s).put(p,set);
     }
     public void addSOP(Integer s, Integer o, Integer p) {
-        if (!SPO.containsKey(s)) {
-            SPO.put(s,new HashMap<>());
+        if (!SOP.containsKey(s)) {
+            SOP.put(s,new HashMap<>());
         }
-        if (!SPO.get(s).containsKey(o)){
-            SPO.get(s).put(p,new HashSet<>());
+        if (!SOP.get(s).containsKey(o)){
+            SOP.get(s).put(o,new HashSet<>());
         }
-        Set<Integer> set = SPO.get(s).get(o);
+        Set<Integer> set = SOP.get(s).get(o);
         set.add(p);
-        SPO.get(s).put(o,set);
+        SOP.get(s).put(o,set);
     }
     public void addPOS(Integer s, Integer o, Integer p) {
-        if (!SPO.containsKey(p)) {
-            SPO.put(p,new HashMap<>());
+        if (!POS.containsKey(p)) {
+            POS.put(p,new HashMap<>());
         }
-        if (!SPO.get(p).containsKey(o)){
-            SPO.get(p).put(o,new HashSet<>());
+        if (!POS.get(p).containsKey(o)){
+            POS.get(p).put(o,new HashSet<>());
         }
-        Set<Integer> set = SPO.get(p).get(o);
+        Set<Integer> set = POS.get(p).get(o);
         set.add(s);
-        SPO.get(p).put(o,set);
+        POS.get(p).put(o,set);
     }
     public void addPSO(Integer s, Integer o, Integer p) {
-        if (!SPO.containsKey(p)) {
-            SPO.put(p,new HashMap<>());
+        if (!PSO.containsKey(p)) {
+            PSO.put(p,new HashMap<>());
         }
-        if (!SPO.get(p).containsKey(s)){
-            SPO.get(p).put(s,new HashSet<>());
+        if (!PSO.get(p).containsKey(s)){
+            PSO.get(p).put(s,new HashSet<>());
         }
-        Set<Integer> set = SPO.get(p).get(s);
+        Set<Integer> set = PSO.get(p).get(s);
         set.add(o);
-        SPO.get(p).put(s,set);
+        PSO.get(p).put(s,set);
     }
     public void addOSP(Integer s, Integer o, Integer p) {
-        if (!SPO.containsKey(o)) {
-            SPO.put(o,new HashMap<>());
+        if (!OSP.containsKey(o)) {
+            OSP.put(o,new HashMap<>());
         }
-        if (!SPO.get(o).containsKey(s)){
-            SPO.get(o).put(s,new HashSet<>());
+        if (!OSP.get(o).containsKey(s)){
+            OSP.get(o).put(s,new HashSet<>());
         }
-        Set<Integer> set = SPO.get(o).get(s);
+        Set<Integer> set = OSP.get(o).get(s);
         set.add(p);
-        SPO.get(o).put(s,set);
+        OSP.get(o).put(s,set);
     }
     public void addOPS(Integer s, Integer o, Integer p) {
-        if (!SPO.containsKey(o)) {
-            SPO.put(o,new HashMap<>());
+        if (!OPS.containsKey(o)) {
+            OPS.put(o,new HashMap<>());
         }
-        if (!SPO.get(o).containsKey(p)){
-            SPO.get(o).put(p,new HashSet<>());
+        if (!OPS.get(o).containsKey(p)){
+            OPS.get(o).put(p,new HashSet<>());
         }
-        Set<Integer> set = SPO.get(o).get(p);
+        Set<Integer> set = OPS.get(o).get(p);
         set.add(s);
-        SPO.get(o).put(p,set);
+        OPS.get(o).put(p,set);
     }
 
     @Override
@@ -129,6 +130,11 @@ public class RDFHexaStore implements RDFStorage {
         addOPS(s, o, p);
         addOSP(s, o, p);
         addPSO(s, o, p);
+        System.out.println("Added triple: " + triple);
+        System.out.println(SPO.keySet());
+        for (Integer key : SPO.keySet()) {
+            System.out.println("    Key: " + key + ", Value: " + SPO.get(key));
+        }
 
         return true;
     }
@@ -199,7 +205,20 @@ public class RDFHexaStore implements RDFStorage {
 
     @Override
     public Collection<RDFTriple> getAtoms() {
-        throw new NotImplementedException();
+        ArrayList<RDFTriple> atoms = new ArrayList<>();
+        for (Integer is : SOP.keySet()) {
+            for (Integer io : SOP.get(is).keySet()) {
+                for (Integer ip : SOP.get(is).get(io)) {
+                    RDFTriple triple = new RDFTriple(
+                            dictionnaire.getDecodageAsTerm(is),
+                            dictionnaire.getDecodageAsTerm(io),
+                            dictionnaire.getDecodageAsTerm(ip)
+                    );
+                    atoms.add(triple);
+                }
+            }
+        }
+        return atoms;
     }
 
     private ArrayList<Substitution> matchAll(Term s, Term p, Term o){;

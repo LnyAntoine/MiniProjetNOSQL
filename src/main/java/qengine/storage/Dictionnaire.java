@@ -38,7 +38,7 @@ public class Dictionnaire {
             if (!tableEncodage.containsKey(term.label())){
                 if (!tableDecodage.containsKey(tableEncodage.size())){
                     tableEncodage.put(term.label(),tableEncodage.size());
-                    tableDecodage.put(tableEncodage.size(), term.label());
+                    tableDecodage.put(tableEncodage.size()-1, term.label());
                 } else {
                     //should not happen
                     return null;

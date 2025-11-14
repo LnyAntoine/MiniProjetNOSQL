@@ -93,4 +93,6 @@ public class RDFTriple extends AtomImpl {
         sb.append('>');
         return sb.toString();
     }
+    @Overrid
+
 }

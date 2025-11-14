@@ -41,6 +41,10 @@ public class RDFHexaStoreTest {
 
         // Vérifier que tous les atomes sont présents
         Collection<RDFTriple> atoms = store.getAtoms();
+        System.out.println(atoms);
+        System.out.println(rdfAtom1);
+        System.out.println(rdfAtom2);
+
         assertTrue(atoms.contains(rdfAtom1), "La base devrait contenir le premier RDFAtom ajouté.");
         assertTrue(atoms.contains(rdfAtom2), "La base devrait contenir le second RDFAtom ajouté.");
 
