@@ -25,6 +25,12 @@ public class RDFHexaStore implements RDFStorage {
 
     public RDFHexaStore() {
         dictionnaire = new Dictionnaire();
+        SPO = new HashMap<>();
+        SOP = new HashMap<>();
+        PSO = new HashMap<>();
+        POS = new HashMap<>();
+        OSP = new HashMap<>();
+        OPS = new HashMap<>();
     }
 
     public void addSPO(Integer s, Integer o, Integer p) {
