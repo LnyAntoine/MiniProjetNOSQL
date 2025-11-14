@@ -6,7 +6,7 @@ import fr.boreal.model.logicalElements.impl.SubstitutionImpl;
 import org.apache.commons.lang3.NotImplementedException;
 import qengine.model.RDFTriple;
 import qengine.model.StarQuery;
-
+import qengine.utils ;
 import java.util.*;
 
 /**
@@ -212,15 +212,12 @@ public class RDFHexaStore implements RDFStorage {
         for (Integer is : SPO.keySet()) {
             for (Integer ip : SPO.get(is).keySet()) {
                 for (Integer io : SPO.get(is).get(ip)) {
-                    RDFTriple triple = new RDFTriple(
-                            dictionnaire.getDecodageAsTerm(is),
-                            dictionnaire.getDecodageAsTerm(ip),
-                            dictionnaire.getDecodageAsTerm(io)
-                    );
                     //SameObjectTermFactory.instance().createOrGetLiteral();
-                    triple = new RDFTriple(createLiteralFromInteger(is),
-                            createLiteralFromInteger(ip),
-                            createLiteralFromInteger(io));
+                    RDFTriple triple = new RDFTriple(
+                            utils.createLiteralFromObject(dictionnaire.getDecodageAsTerm(is)),
+                            utils.createLiteralFromObject(dictionnaire.getDecodageAsTerm(ip)),
+                            utils.createLiteralFromObject(dictionnaire.getDecodageAsTerm(io))
+                    );
                     atoms.add(triple);
                 }
             }
@@ -420,8 +417,6 @@ public class RDFHexaStore implements RDFStorage {
                 SPO.size() == PSO.size();
     }
 
-    private Literal createLiteralFromInteger(Integer value) {
-        return SameObjectTermFactory.instance().createOrGetLiteral(dictionnaire.getDecodage(value));
-    }
+
 
 }
