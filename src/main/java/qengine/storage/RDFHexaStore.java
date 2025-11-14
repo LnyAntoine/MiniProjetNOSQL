@@ -1,6 +1,7 @@
 package qengine.storage;
 
 import fr.boreal.model.logicalElements.api.*;
+import fr.boreal.model.logicalElements.factory.impl.SameObjectTermFactory;
 import fr.boreal.model.logicalElements.impl.SubstitutionImpl;
 import org.apache.commons.lang3.NotImplementedException;
 import qengine.model.RDFTriple;
@@ -34,7 +35,7 @@ public class RDFHexaStore implements RDFStorage {
         OPS = new HashMap<>();
     }
 
-    public void addSPO(Integer s, Integer o, Integer p) {
+    public void addSPO(Integer s, Integer p, Integer o) {
         if (!SPO.containsKey(s)) {
             SPO.put(s,new HashMap<>());
         }
@@ -45,7 +46,7 @@ public class RDFHexaStore implements RDFStorage {
         set.add(o);
         SPO.get(s).put(p,set);
     }
-    public void addSOP(Integer s, Integer o, Integer p) {
+    public void addSOP(Integer s, Integer p, Integer o) {
         if (!SOP.containsKey(s)) {
             SOP.put(s,new HashMap<>());
         }
@@ -56,7 +57,7 @@ public class RDFHexaStore implements RDFStorage {
         set.add(p);
         SOP.get(s).put(o,set);
     }
-    public void addPOS(Integer s, Integer o, Integer p) {
+    public void addPOS(Integer s, Integer p, Integer o) {
         if (!POS.containsKey(p)) {
             POS.put(p,new HashMap<>());
         }
@@ -67,7 +68,7 @@ public class RDFHexaStore implements RDFStorage {
         set.add(s);
         POS.get(p).put(o,set);
     }
-    public void addPSO(Integer s, Integer o, Integer p) {
+    public void addPSO(Integer s, Integer p, Integer o) {
         if (!PSO.containsKey(p)) {
             PSO.put(p,new HashMap<>());
         }
@@ -78,7 +79,7 @@ public class RDFHexaStore implements RDFStorage {
         set.add(o);
         PSO.get(p).put(s,set);
     }
-    public void addOSP(Integer s, Integer o, Integer p) {
+    public void addOSP(Integer s, Integer p, Integer o) {
         if (!OSP.containsKey(o)) {
             OSP.put(o,new HashMap<>());
         }
@@ -89,7 +90,7 @@ public class RDFHexaStore implements RDFStorage {
         set.add(p);
         OSP.get(o).put(s,set);
     }
-    public void addOPS(Integer s, Integer o, Integer p) {
+    public void addOPS(Integer s, Integer p, Integer o) {
         if (!OPS.containsKey(o)) {
             OPS.put(o,new HashMap<>());
         }
@@ -121,20 +122,16 @@ public class RDFHexaStore implements RDFStorage {
         }
 
         Integer s = Integer.parseInt(triple.getTerms()[0].label());
-        Integer o = Integer.parseInt(triple.getTerms()[1].label());
-        Integer p = Integer.parseInt(triple.getTerms()[2].label());
+        Integer p = Integer.parseInt(triple.getTerms()[1].label());
+        Integer o = Integer.parseInt(triple.getTerms()[2].label());
 
-        addSPO(s, o, p);
-        addPOS(s, o, p);
-        addSOP(s, o, p);
-        addOPS(s, o, p);
-        addOSP(s, o, p);
-        addPSO(s, o, p);
-        System.out.println("Added triple: " + triple);
-        System.out.println(SPO.keySet());
-        for (Integer key : SPO.keySet()) {
-            System.out.println("    Key: " + key + ", Value: " + SPO.get(key));
-        }
+        addSPO(s, p, o);
+        addPOS(s, p, o);
+        addSOP(s, p, o);
+        addOPS(s, p, o);
+        addOSP(s, p, o);
+        addPSO(s, p, o);
+
 
         return true;
     }
@@ -147,8 +144,14 @@ public class RDFHexaStore implements RDFStorage {
 
     @Override
     public Iterator<Substitution> match(RDFTriple triple) {
+        System.out.println("Matching triple: " + triple);
+        System.out.println("SPO :");
+        System.out.println(SPO.keySet());
+        for (Integer key : SPO.keySet()) {
+            System.out.println("    Key: " + key + ", Value: " + SPO.get(key));
+        }
         ArrayList<Substitution> substitutions = new ArrayList<>();
-
+        System.out.println();
         if (triple==null) {
             return substitutions.iterator();
         }
@@ -206,14 +209,18 @@ public class RDFHexaStore implements RDFStorage {
     @Override
     public Collection<RDFTriple> getAtoms() {
         ArrayList<RDFTriple> atoms = new ArrayList<>();
-        for (Integer is : SOP.keySet()) {
-            for (Integer io : SOP.get(is).keySet()) {
-                for (Integer ip : SOP.get(is).get(io)) {
+        for (Integer is : SPO.keySet()) {
+            for (Integer ip : SPO.get(is).keySet()) {
+                for (Integer io : SPO.get(is).get(ip)) {
                     RDFTriple triple = new RDFTriple(
                             dictionnaire.getDecodageAsTerm(is),
-                            dictionnaire.getDecodageAsTerm(io),
-                            dictionnaire.getDecodageAsTerm(ip)
+                            dictionnaire.getDecodageAsTerm(ip),
+                            dictionnaire.getDecodageAsTerm(io)
                     );
+                    //SameObjectTermFactory.instance().createOrGetLiteral();
+                    triple = new RDFTriple(createLiteralFromInteger(is),
+                            createLiteralFromInteger(ip),
+                            createLiteralFromInteger(io));
                     atoms.add(triple);
                 }
             }
@@ -411,6 +418,10 @@ public class RDFHexaStore implements RDFStorage {
                 SPO.size() == OPS.size() &&
                 SPO.size() == OSP.size() &&
                 SPO.size() == PSO.size();
+    }
+
+    private Literal createLiteralFromInteger(Integer value) {
+        return SameObjectTermFactory.instance().createOrGetLiteral(dictionnaire.getDecodage(value));
     }
 
 }

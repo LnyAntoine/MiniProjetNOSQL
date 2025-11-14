@@ -98,9 +98,11 @@ public class RDFTriple extends AtomImpl {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         RDFTriple other = (RDFTriple) obj;
-        return this.getTerms()[0].label().equals(other.getTerms()[0].label()) &&
-               this.getTerms()[1].label().equals(other.getTerms()[1].label()) &&
-               this.getTerms()[2].label().equals(other.getTerms()[2].label());
+        return this.getTerms()[0].equals(other.getTerms()[0]) &&
+               this.getTerms()[1].equals(other.getTerms()[1]) &&
+               this.getTerms()[2].equals(other.getTerms()[2]);
     }
+
+
 
 }
