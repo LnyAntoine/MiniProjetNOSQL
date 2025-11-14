@@ -7,7 +7,7 @@ public class utils {
     public static Literal<Integer> createLiteralFromInteger(Integer value) {
         return SameObjectTermFactory.instance().createOrGetLiteral(value);
     }
-    public Literal<String> createLiteralFromString(String value) {
+    public static Literal<String> createLiteralFromString(String value) {
         return SameObjectTermFactory.instance().createOrGetLiteral(value);
     }
     public static Literal<?> createLiteralFromObject(Object value) {
