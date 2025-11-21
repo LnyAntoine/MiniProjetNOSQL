@@ -132,7 +132,6 @@ public class RDFHexaStore implements RDFStorage {
         addOSP(s, p, o);
         addPSO(s, p, o);
 
-
         return true;
     }
 
@@ -198,7 +197,19 @@ public class RDFHexaStore implements RDFStorage {
 
     @Override
     public Iterator<Substitution> match(StarQuery q) {
-        throw new NotImplementedException();
+        try {
+            Variable v = q.getCentralVariable();
+            List<Iterator<Substitution>> iterators = new ArrayList<>();
+            for (RDFTriple triple : q.getRdfAtoms()) {
+                Iterator<Substitution> it = match(triple);
+                iterators.add(it);
+            }
+            return utils.intersectIterators(iterators);
+
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            return new ArrayList<Substitution>().iterator();
+        }
     }
 
     @Override
