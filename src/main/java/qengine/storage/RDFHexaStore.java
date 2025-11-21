@@ -1,7 +1,6 @@
 package qengine.storage;
 
 import fr.boreal.model.logicalElements.api.*;
-import fr.boreal.model.logicalElements.factory.impl.SameObjectTermFactory;
 import fr.boreal.model.logicalElements.impl.SubstitutionImpl;
 import org.apache.commons.lang3.NotImplementedException;
 import qengine.model.RDFTriple;
@@ -205,7 +204,7 @@ public class RDFHexaStore implements RDFStorage {
 
                 iterators.add(it);
             }
-            return utils.intersectIterators2(iterators);
+            return utils.intersectIteratorsOptimized(iterators);
 
         } catch (Exception e) {
             e.printStackTrace();
