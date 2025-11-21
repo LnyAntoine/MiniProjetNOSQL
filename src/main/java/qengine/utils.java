@@ -3,7 +3,6 @@ package qengine;
 import fr.boreal.model.logicalElements.api.Literal;
 import fr.boreal.model.logicalElements.api.Substitution;
 import fr.boreal.model.logicalElements.factory.impl.SameObjectTermFactory;
-import fr.boreal.model.logicalElements.impl.SubstitutionImpl;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -27,7 +26,7 @@ public class utils {
         return SameObjectTermFactory.instance().createOrGetLiteral(value);
     }
 
-    public static Iterator<Substitution> intersectIterators2(List<Iterator<Substitution>> iterators) {
+    public static Iterator<Substitution> intersectIteratorsOptimized(List<Iterator<Substitution>> iterators) {
         ArrayList<Substitution> result = new ArrayList<>();
         if (iterators.isEmpty()) {
             return result.iterator();
