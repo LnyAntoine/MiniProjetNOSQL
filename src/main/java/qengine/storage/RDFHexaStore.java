@@ -202,11 +202,12 @@ public class RDFHexaStore implements RDFStorage {
             List<Iterator<Substitution>> iterators = new ArrayList<>();
             for (RDFTriple triple : q.getRdfAtoms()) {
                 Iterator<Substitution> it = match(triple);
+
                 iterators.add(it);
             }
-            return utils.intersectIterators(iterators);
+            return utils.intersectIterators2(iterators);
 
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return new ArrayList<Substitution>().iterator();
         }
@@ -214,6 +215,9 @@ public class RDFHexaStore implements RDFStorage {
 
     @Override
     public long howMany(RDFTriple triple) {
+
+
+
         throw new NotImplementedException();
     }
 
