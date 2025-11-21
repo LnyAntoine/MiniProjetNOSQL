@@ -105,12 +105,13 @@ public final class Example {
 	}
 
 	/**
-	 * Exécute une requête en étoile sur le store et affiche les résultats.
-	 *
-	 * @param starQuery La requête à exécuter
-	 * @param factBase  Le store contenant les triplets
-	 */
-	public static void executeStarQuery(StarQuery starQuery, FactBase factBase) {
+     * Exécute une requête en étoile sur le store et affiche les résultats.
+     *
+     * @param starQuery La requête à exécuter
+     * @param factBase  Le store contenant les triplets
+     * @return
+     */
+	public static Iterator<Substitution> executeStarQuery(StarQuery starQuery, FactBase factBase) {
 		FOQuery<FOFormulaConjunction> foQuery = starQuery.asFOQuery(); // Conversion en FOQuery
 		FOQueryEvaluator<FOFormula> evaluator = GenericFOQueryEvaluator.defaultInstance(); // Créer un évaluateur
 		Iterator<Substitution> queryResults = evaluator.evaluate(foQuery, factBase); // Évaluer la requête
@@ -120,10 +121,11 @@ public final class Example {
 		if (!queryResults.hasNext()) {
 			System.out.println("No answer.");
 		}
-		while (queryResults.hasNext()) {
+		return queryResults;
+     /*   while (queryResults.hasNext()) {
 			Substitution result = queryResults.next();
 			System.out.println(result); // Afficher chaque réponse
-		}
-		System.out.println();
+		}*/
+
 	}
 }

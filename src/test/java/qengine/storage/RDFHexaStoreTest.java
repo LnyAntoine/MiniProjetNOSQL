@@ -94,7 +94,7 @@ public class RDFHexaStoreTest {
 
         assertTrue(store.add(rdfAtom1), "Le RDFAtom1 devrait être ajouté avec succès.");
         assertTrue(store.add(rdfAtom2), "Le RDFAtom2 devrait être ajouté avec succès.");
-        assertTrue(store.size()==1, "Taille devrait être égale à 1");
+        assertTrue(store.size() == 1, "Taille devrait être égale à 1");
 
     }
 
@@ -166,7 +166,6 @@ public class RDFHexaStoreTest {
         assertTrue(matchedAtoms.next().equals(firstResult), "Missing substitution: " + firstResult);
 
 
-
     }
 
 
@@ -183,6 +182,7 @@ public class RDFHexaStoreTest {
         store.add(ex1); // RDFAtom(subject1, triple, object1)
         store.add(ex2); // RDFAtom(subject2, triple, object2)
         store.add(ex3); // RDFAtom(subject1, triple, object3)
+
         factBase.add(ex1);
         factBase.add(ex2);
         factBase.add(ex3);
@@ -192,15 +192,30 @@ public class RDFHexaStoreTest {
 
         List<RDFTriple> rdfAtoms = List.of(triple1, triple2);
         Collection<Variable> answerVariables = List.of(VAR_X);
+
         StarQuery query = new StarQuery("Requête étoile valide", rdfAtoms, answerVariables);
         FOQuery<FOFormulaConjunction> foQuery = query.asFOQuery();
+
         assertEquals(answerVariables, foQuery.getAnswerVariables(), "Les variables de réponse doivent être les mêmes que celles de la requête étoile.");
 
+        Substitution firstResult = new SubstitutionImpl();
+        firstResult.add(VAR_X, SUBJECT_1);
+
+        Iterator<Substitution> matchedAtoms = store.match(query);
+        ;
+
+        Iterator<Substitution> integraal_result = executeStarQuery(query, factBase);
+
+        // Convertir en ensembles
+        Set<Substitution> hexastore = new HashSet<>();
+        matchedAtoms.forEachRemaining(hexastore::add);
+
+        Set<Substitution> oracleResults = new HashSet<>();
+        integraal_result.forEachRemaining(oracleResults::add);
 
 
+        assertEquals(hexastore, oracleResults, "pas bien");
 
-
-        
 
         // Exécuter les requêtes sur le store
     }
