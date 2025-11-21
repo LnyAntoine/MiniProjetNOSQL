@@ -28,7 +28,7 @@ public class Dictionnaire {
                 ? createLiteralFromObject(getEncodage(triple.getTerm(1)))
                 : triple.getTerm(1);
         Term oEncoded = triple.getTerm(2).isLiteral()
-                ? createLiteralFromObject(getDecodage(triple.getTerms()[2]))
+                ? createLiteralFromObject(getEncodage(triple.getTerms()[2]))
                 : triple.getTerm(2);
 
         return new RDFTriple(sEncoded, pEncoded, oEncoded);

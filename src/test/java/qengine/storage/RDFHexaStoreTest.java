@@ -1,15 +1,22 @@
 package qengine.storage;
 
+import fr.boreal.model.formula.api.FOFormulaConjunction;
+import fr.boreal.model.kb.api.FactBase;
 import fr.boreal.model.logicalElements.api.*;
 import fr.boreal.model.logicalElements.factory.impl.SameObjectTermFactory;
 import fr.boreal.model.logicalElements.impl.SubstitutionImpl;
+import fr.boreal.model.query.api.FOQuery;
+import fr.boreal.storage.natives.SimpleInMemoryGraphStore;
 import org.apache.commons.lang3.NotImplementedException;
 import qengine.model.RDFTriple;
 import org.junit.jupiter.api.Test;
+import qengine.model.StarQuery;
+import qengine.program.Example;
 
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static qengine.program.Example.executeStarQuery;
 
 /**
  * Tests unitaires pour la classe {@link RDFHexaStore}.
@@ -41,9 +48,6 @@ public class RDFHexaStoreTest {
 
         // Vérifier que tous les atomes sont présents
         Collection<RDFTriple> atoms = store.getAtoms();
-        System.out.println(atoms);
-        System.out.println(rdfAtom1);
-        System.out.println(rdfAtom2);
 
         assertTrue(atoms.contains(rdfAtom1), "La base devrait contenir le premier RDFAtom ajouté.");
         assertTrue(atoms.contains(rdfAtom2), "La base devrait contenir le second RDFAtom ajouté.");
@@ -83,12 +87,28 @@ public class RDFHexaStoreTest {
 
     @Test
     public void testAddDuplicateAtom() {
-        throw new NotImplementedException();
+        RDFHexaStore store = new RDFHexaStore();
+
+        RDFTriple rdfAtom1 = new RDFTriple(SUBJECT_1, PREDICATE_1, OBJECT_1);
+        RDFTriple rdfAtom2 = new RDFTriple(SUBJECT_1, PREDICATE_1, OBJECT_1);
+
+        assertTrue(store.add(rdfAtom1), "Le RDFAtom1 devrait être ajouté avec succès.");
+        assertTrue(store.add(rdfAtom2), "Le RDFAtom2 devrait être ajouté avec succès.");
+        assertTrue(store.size()==1, "Taille devrait être égale à 1");
+
     }
 
     @Test
     public void testSize() {
-        throw new NotImplementedException();
+        RDFHexaStore store = new RDFHexaStore();
+
+        // Version stream
+        // Ajouter plusieurs RDFAtom
+        RDFTriple rdfAtom1 = new RDFTriple(SUBJECT_1, PREDICATE_1, OBJECT_1);
+        RDFTriple rdfAtom2 = new RDFTriple(SUBJECT_2, PREDICATE_2, OBJECT_2);
+        assertTrue(store.add(rdfAtom1), "Le RDFAtom1 devrait être ajouté avec succès.");
+        assertTrue(store.add(rdfAtom2), "Le RDFAtom2 devrait être ajouté avec succès.");
+        assertTrue(store.size() == 2, "Taille devrait être à égale à 2");
     }
 
     @Test
@@ -110,7 +130,7 @@ public class RDFHexaStoreTest {
         firstResult.add(VAR_X, OBJECT_1);
         Substitution secondResult = new SubstitutionImpl();
         secondResult.add(VAR_X, OBJECT_3);
-
+        System.out.println(matchedList.size());
         System.out.println(firstResult);
         System.out.println(secondResult);
         System.out.println(matchedList);
@@ -124,7 +144,65 @@ public class RDFHexaStoreTest {
 
     @Test
     public void testMatchStarQuery() {
-        throw new NotImplementedException();
+        RDFHexaStore store = new RDFHexaStore();
+        store.add(new RDFTriple(SUBJECT_1, PREDICATE_1, OBJECT_1)); // RDFAtom(subject1, triple, object1)
+        store.add(new RDFTriple(SUBJECT_2, PREDICATE_1, OBJECT_2)); // RDFAtom(subject2, triple, object2)
+        store.add(new RDFTriple(SUBJECT_1, PREDICATE_1, OBJECT_3)); // RDFAtom(subject1, triple, object3)
+
+
+        RDFTriple triple1 = new RDFTriple(VAR_X, PREDICATE_1, OBJECT_1);
+        RDFTriple triple2 = new RDFTriple(VAR_X, PREDICATE_1, OBJECT_3);
+
+        List<RDFTriple> rdfAtoms = List.of(triple1, triple2);
+        Collection<Variable> answerVariables = List.of(VAR_X);
+
+        StarQuery query = new StarQuery("Requête étoile valide", rdfAtoms, answerVariables);
+
+        Iterator<Substitution> matchedAtoms = store.match(query);
+        Substitution firstResult = new SubstitutionImpl();
+        firstResult.add(VAR_X, SUBJECT_1);
+
+        assertTrue(matchedAtoms.hasNext(), "Missing substitution: " + firstResult);
+        assertTrue(matchedAtoms.next().equals(firstResult), "Missing substitution: " + firstResult);
+
+
+
+    }
+
+
+    @Test
+    public void test_verify() {
+        RDFHexaStore store = new RDFHexaStore();
+        FactBase factBase = new SimpleInMemoryGraphStore();
+
+
+        RDFTriple ex1 = new RDFTriple(SUBJECT_1, PREDICATE_1, OBJECT_1);
+        RDFTriple ex2 = new RDFTriple(SUBJECT_2, PREDICATE_1, OBJECT_2);
+        RDFTriple ex3 = new RDFTriple(SUBJECT_1, PREDICATE_1, OBJECT_3);
+
+        store.add(ex1); // RDFAtom(subject1, triple, object1)
+        store.add(ex2); // RDFAtom(subject2, triple, object2)
+        store.add(ex3); // RDFAtom(subject1, triple, object3)
+        factBase.add(ex1);
+        factBase.add(ex2);
+        factBase.add(ex3);
+
+        RDFTriple triple1 = new RDFTriple(VAR_X, PREDICATE_1, OBJECT_1);
+        RDFTriple triple2 = new RDFTriple(VAR_X, PREDICATE_1, OBJECT_3);
+
+        List<RDFTriple> rdfAtoms = List.of(triple1, triple2);
+        Collection<Variable> answerVariables = List.of(VAR_X);
+        StarQuery query = new StarQuery("Requête étoile valide", rdfAtoms, answerVariables);
+        FOQuery<FOFormulaConjunction> foQuery = query.asFOQuery();
+        assertEquals(answerVariables, foQuery.getAnswerVariables(), "Les variables de réponse doivent être les mêmes que celles de la requête étoile.");
+
+
+
+
+
+        
+
+        // Exécuter les requêtes sur le store
     }
 
     // Vos autres tests d'HexaStore ici

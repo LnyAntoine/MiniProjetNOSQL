@@ -110,7 +110,7 @@ public final class Example {
 	 * @param starQuery La requête à exécuter
 	 * @param factBase  Le store contenant les triplets
 	 */
-	private static void executeStarQuery(StarQuery starQuery, FactBase factBase) {
+	public static void executeStarQuery(StarQuery starQuery, FactBase factBase) {
 		FOQuery<FOFormulaConjunction> foQuery = starQuery.asFOQuery(); // Conversion en FOQuery
 		FOQueryEvaluator<FOFormula> evaluator = GenericFOQueryEvaluator.defaultInstance(); // Créer un évaluateur
 		Iterator<Substitution> queryResults = evaluator.evaluate(foQuery, factBase); // Évaluer la requête
