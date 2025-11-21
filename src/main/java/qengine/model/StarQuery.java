@@ -64,7 +64,6 @@ public class StarQuery implements Query {
                 .filter(term -> term instanceof Variable)
                 .map(term -> (Variable) term)
                 .collect(Collectors.toSet());
-
         // Vérifier qu'une seule variable est partagée
         for (Variable candidate : sharedVariables) {
             if (rdfTriples.stream()
