@@ -196,20 +196,7 @@ public class RDFHexaStore implements RDFStorage {
 
     @Override
     public Iterator<Substitution> match(StarQuery q) {
-        try {
-            Variable v = q.getCentralVariable();
-            List<Iterator<Substitution>> iterators = new ArrayList<>();
-            for (RDFTriple triple : q.getRdfAtoms()) {
-                Iterator<Substitution> it = match(triple);
-
-                iterators.add(it);
-            }
-            return utils.intersectIteratorsOptimized(iterators);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ArrayList<Substitution>().iterator();
-        }
+        return RDFStorage.super.match(q);
     }
 
     @Override
