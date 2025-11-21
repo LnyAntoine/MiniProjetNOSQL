@@ -59,7 +59,7 @@ public final class Example {
 	 * @param rdfFilePath Chemin vers le fichier RDF à parser
 	 * @return Liste des RDFAtoms parsés
 	 */
-	private static List<RDFTriple> parseRDFData(String rdfFilePath) throws IOException {
+	public static List<RDFTriple> parseRDFData(String rdfFilePath) throws IOException {
 		FileReader rdfFile = new FileReader(rdfFilePath);
 		List<RDFTriple> rdfAtoms = new ArrayList<>();
 
@@ -81,7 +81,7 @@ public final class Example {
 	 * @param queryFilePath Chemin vers le fichier de requêtes SparQL
 	 * @return Liste des StarQueries parsées
 	 */
-	private static List<StarQuery> parseSparQLQueries(String queryFilePath) throws IOException {
+	public static List<StarQuery> parseSparQLQueries(String queryFilePath) throws IOException {
 		List<StarQuery> starQueries = new ArrayList<>();
 
 		try (StarQuerySparQLParser queryParser = new StarQuerySparQLParser(queryFilePath)) {
