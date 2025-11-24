@@ -40,9 +40,13 @@ public interface RDFStorage {
             q.getCentralVariable();
             RDFTriple triple = q.getRdfAtoms().getFirst();
             Iterator<Substitution> it = match(triple);
-            for (int i = 1; i < q.getRdfAtoms().size(); i++) {
+            for (int i = 1; i < q.getRdfAtoms().size() && it.hasNext(); i++) {
                 RDFTriple t = q.getRdfAtoms().get(i);
                 Iterator<Substitution> it2 = match(t);
+                if (!it2.hasNext()) {
+                    it = new ArrayList<Substitution>().iterator();
+                    continue;
+                }
                 it = utils.intersectTwoIterators(it, it2);
             }
             return it;

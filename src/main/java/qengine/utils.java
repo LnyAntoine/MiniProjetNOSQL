@@ -29,6 +29,9 @@ public class utils {
     public static Iterator<Substitution> intersectTwoIterators(Iterator<Substitution> it1, Iterator<Substitution> it2) {
         ArrayList<Substitution> list1 = new ArrayList<>();
         ArrayList<Substitution> result = new ArrayList<>();
+        if (!it1.hasNext() || !it2.hasNext()) {
+            return result.iterator();
+        }
         while (it1.hasNext()) {
             Substitution s = it1.next();
             list1.add(s);
