@@ -133,11 +133,31 @@ public class RDFHexaStore implements RDFStorage {
 
         return true;
     }
+    public int sizeStore(Map<Integer, Map<Integer, Set<Integer>>> map) {
+        int size = 0;
+        for (Map<Integer, Set<Integer>> triple : map.values()) {
+            for (Set<Integer> set : triple.values()) {
+                for(Integer p : set) {
+                    size ++;
+                }
+            }
+
+        }
+        return size;
+    }
 
     @Override
     public long size() {
-        if (checkSynchronization()) return SPO.size();
-        else return -1;
+/*        if (checkSynchronization()) return SPO.size();
+        else return -1;*/
+        System.out.println(sizeStore(SOP));
+        System.out.println(sizeStore(SPO));
+        System.out.println(sizeStore(PSO));
+        System.out.println(sizeStore(OPS));
+        System.out.println(sizeStore(OSP));
+        System.out.println(sizeStore(POS));
+
+        return SPO.size();
     }
 
     @Override
