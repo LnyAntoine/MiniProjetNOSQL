@@ -26,62 +26,19 @@ public class utils {
         return SameObjectTermFactory.instance().createOrGetLiteral(value);
     }
 
-    public static Iterator<Substitution> intersectIteratorsOptimized(List<Iterator<Substitution>> iterators) {
+    public static Iterator<Substitution> intersectTwoIterators(Iterator<Substitution> it1, Iterator<Substitution> it2) {
+        ArrayList<Substitution> list1 = new ArrayList<>();
         ArrayList<Substitution> result = new ArrayList<>();
-        if (iterators.isEmpty()) {
+        if (!it1.hasNext() || !it2.hasNext()) {
             return result.iterator();
         }
-        Iterator<Substitution> iterator = iterators.getFirst();
-        while (iterator.hasNext()) {
-            Substitution sub = iterator.next();
-            boolean found = true;
-            for (int i = 1; i < iterators.size(); i++) {
-                Iterator<Substitution> it = iterators.get(i);
-                List<Substitution> subList = new ArrayList<>();
-                while (it.hasNext()) {
-                    Substitution s = it.next();
-                    subList.add(s);
-                    if (!s.equals(sub)) {
-                        found = false;
-                        break;
-                    }
-                }
-                it = subList.iterator();
-                iterators.set(i, it);
-            }
-            if (found) {
-                result.add(sub);
-            }
+        while (it1.hasNext()) {
+            Substitution s = it1.next();
+            list1.add(s);
         }
-        return result.iterator();
-    }
-
-    public static Iterator<Substitution> intersectIterators(List<Iterator<Substitution>> iterators) {
-        ArrayList<List<Substitution>> list = new ArrayList<>();
-        for (Iterator<Substitution> it : iterators) {
-            List<Substitution> singleList = new ArrayList<>();
-            while (it.hasNext()) {
-                Substitution s = it.next();
-                singleList.add(s);
-            }
-            list.add(singleList);
-        }
-        ArrayList<Substitution> result = new ArrayList<>();
-        int minimalSizeIndex = 0;
-        for (int i = 1; i < list.size(); i++) {
-            if (list.get(i).size() < list.get(minimalSizeIndex).size()) {
-                minimalSizeIndex = i;
-            }
-        }
-        for (Substitution s : list.get(minimalSizeIndex)) {
-            boolean presentInAll = true;
-            for (int i = 1; i < list.size(); i++) {
-                if (!list.get(i).contains(s)) {
-                    presentInAll = false;
-                    break;
-                }
-            }
-            if (presentInAll) {
+        while (it2.hasNext()) {
+            Substitution s = it2.next();
+            if (list1.contains(s)) {
                 result.add(s);
             }
         }

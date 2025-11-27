@@ -1,5 +1,6 @@
 package qengine.storage;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.stream.Stream;
@@ -7,6 +8,7 @@ import java.util.stream.Stream;
 import fr.boreal.model.logicalElements.api.Substitution;
 import qengine.model.RDFTriple;
 import qengine.model.StarQuery;
+import qengine.utils;
 
 /**
  * Contrat pour un système de stockage de données RDF
@@ -33,7 +35,26 @@ public interface RDFStorage {
      * @param q star query
      * @return an itérateur de subsitutions décrivrant les réponses à la requete
      */
-    Iterator<Substitution> match(StarQuery q);
+    default Iterator<Substitution> match(StarQuery q){
+        try {
+            q.getCentralVariable();
+            RDFTriple triple = q.getRdfAtoms().getFirst();
+            Iterator<Substitution> it = match(triple);
+            for (int i = 1; i < q.getRdfAtoms().size() && it.hasNext(); i++) {
+                RDFTriple t = q.getRdfAtoms().get(i);
+                Iterator<Substitution> it2 = match(t);
+                if (!it2.hasNext()) {
+                    it = new ArrayList<Substitution>().iterator();
+                    continue;
+                }
+                it = utils.intersectTwoIterators(it, it2);
+            }
+            return it;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<Substitution>().iterator();
+        }
+    }
 
 
     /**
