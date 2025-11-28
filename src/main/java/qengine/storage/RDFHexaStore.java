@@ -160,15 +160,14 @@ public class RDFHexaStore implements RDFStorage {
          */
         return true;
     }
-    public int sizeStore(Map<Integer, Map<Integer, Set<Integer>>> map) {
+    public int sizeStore(Map<Integer, SndValue> map) {
         int size = 0;
-        for (Map<Integer, Set<Integer>> triple : map.values()) {
-            for (Set<Integer> set : triple.values()) {
-                for(Integer p : set) {
-                    size ++;
-                }
+        for (Integer key : map.keySet()) {
+            if (key==-1) continue;
+            for (Integer sndKey : map.get(key).map.keySet()){
+                if (sndKey==-1) continue;
+                size += map.get(key).map.get(sndKey).set.size();
             }
-
         }
         return size;
     }
