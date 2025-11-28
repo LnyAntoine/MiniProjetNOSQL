@@ -211,6 +211,7 @@ public class RDFHexaStore implements RDFStorage {
     @Override
     public Iterator<Substitution> match(StarQuery q) {
         return RDFStorage.super.match(q);
+
     }
 
     @Override

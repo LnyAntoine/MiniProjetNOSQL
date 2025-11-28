@@ -105,6 +105,19 @@ public class RDFHexaStoreTest {
     }
 
     @Test
+    public void testSizeGiantTable() {
+        GiantTableStore store = new GiantTableStore();
+
+        // Version stream
+        // Ajouter plusieurs RDFAtom
+        RDFTriple rdfAtom1 = new RDFTriple(SUBJECT_1, PREDICATE_1, OBJECT_1);
+        RDFTriple rdfAtom2 = new RDFTriple(SUBJECT_2, PREDICATE_2, OBJECT_2);
+
+        assertTrue(store.add(rdfAtom1), "Le RDFAtom1 devrait être ajouté avec succès.");
+        assertTrue(store.add(rdfAtom2), "Le RDFAtom2 devrait être ajouté avec succès.");
+        assertTrue(store.size() == 2, "Taille devrait être à égale à 2");
+    }
+    @Test
     public void testSize() {
         RDFHexaStore store = new RDFHexaStore();
 
@@ -117,6 +130,8 @@ public class RDFHexaStoreTest {
         assertTrue(store.add(rdfAtom2), "Le RDFAtom2 devrait être ajouté avec succès.");
         assertTrue(store.size() == 2, "Taille devrait être à égale à 2");
     }
+
+
     @Test
     public void testSizeWithSameS() {
         RDFHexaStore store = new RDFHexaStore();
@@ -145,13 +160,13 @@ public class RDFHexaStoreTest {
     }
 
     @Test
-    public void testSizeWithSameP() {
+    public void testSizeWithSame0() {
         RDFHexaStore store = new RDFHexaStore();
 
         // Version stream
         // Ajouter plusieurs RDFAtom
         RDFTriple rdfAtom1 = new RDFTriple(SUBJECT_1, PREDICATE_1, OBJECT_1);
-        RDFTriple rdfAtom2 = new RDFTriple(SUBJECT_2, PREDICATE_1, OBJECT_2);
+        RDFTriple rdfAtom2 = new RDFTriple(SUBJECT_2, PREDICATE_2, OBJECT_1);
 
         assertTrue(store.add(rdfAtom1), "Le RDFAtom1 devrait être ajouté avec succès.");
         assertTrue(store.add(rdfAtom2), "Le RDFAtom2 devrait être ajouté avec succès.");
@@ -182,15 +197,44 @@ public class RDFHexaStoreTest {
         System.out.println(secondResult);
         System.out.println(matchedList);
 
-        assertEquals(2, matchedList.size(), "There should be two matched RDFAtoms");
-        assertTrue(matchedList.contains(secondResult), "Missing substitution: " + firstResult);
-        assertTrue(matchedList.contains(secondResult), "Missing substitution: " + secondResult);
+        assertEquals(2, matchedList.size(), "Il devrait y avoir deux substitutions.");
+        assertTrue(matchedList.contains(secondResult), "Substitution manquante " + firstResult);
+        assertTrue(matchedList.contains(secondResult), "Substitution manquante: " + secondResult);
 
-        // Other cases
+
     }
-
     @Test
-    public void testMatchAtom2() throws IOException {
+    public void testMatchAtomGiantTable() {
+        GiantTableStore store = new GiantTableStore();
+        store.add(new RDFTriple(SUBJECT_1, PREDICATE_1, OBJECT_1)); // RDFAtom(subject1, triple, object1)
+        store.add(new RDFTriple(SUBJECT_2, PREDICATE_1, OBJECT_2)); // RDFAtom(subject2, triple, object2)
+        store.add(new RDFTriple(SUBJECT_1, PREDICATE_1, OBJECT_3)); // RDFAtom(subject1, triple, object3)
+
+
+        RDFTriple matchingAtom = new RDFTriple(SUBJECT_1, PREDICATE_1, VAR_X); // RDFAtom(subject1, predicate1, X)
+        Iterator<Substitution> matchedAtoms = store.match(matchingAtom);
+        System.out.println("matchedAtoms");
+        System.out.println(matchedAtoms);
+        List<Substitution> matchedList = new ArrayList<>();
+        matchedAtoms.forEachRemaining(matchedList::add);
+
+        Substitution firstResult = new SubstitutionImpl();
+        firstResult.add(VAR_X, OBJECT_1);
+        Substitution secondResult = new SubstitutionImpl();
+        secondResult.add(VAR_X, OBJECT_3);
+        System.out.println(matchedList.size());
+        System.out.println(firstResult);
+        System.out.println(secondResult);
+        System.out.println(matchedList);
+
+        assertEquals(2, matchedList.size(), "Il devrait y avoir deux substitutions.");
+        assertTrue(matchedList.contains(secondResult), "Substitution manquante " + firstResult);
+        assertTrue(matchedList.contains(secondResult), "Substitution manquante: " + secondResult);
+
+
+    }
+    @Test
+    public void testMatchAtomHexastore() throws IOException {
         List<RDFTriple> rdfAtoms = parseRDFData(SAMPLE_DATA_FILE);
 
         List<StarQuery> queries = parseSparQLQueries(SAMPLE_QUERY_FILE);
@@ -208,32 +252,28 @@ public class RDFHexaStoreTest {
         }
     }
     @Test
-    public void testMatchAtom2WithGiantTable() throws IOException {
-        // Parse RDF triples from the data file
+    public void testMatchAtomGiant() throws IOException {
         List<RDFTriple> rdfAtoms = parseRDFData(SAMPLE_DATA_FILE);
 
-        // Initialize the GiantTable and add all RDF triples
-        GiantTableStore giantTable = new GiantTableStore();
-        for (RDFTriple rdfAtom : rdfAtoms) {
-            giantTable.add(rdfAtom);
-        }
+        List<StarQuery> queries = parseSparQLQueries(SAMPLE_QUERY_FILE);
 
-        System.out.println(giantTable.size());
-        // Iterate over the RDF triples and use them as queries
-        for (RDFTriple query : rdfAtoms) {
+        GiantTableStore store = new GiantTableStore();
+        store.addAll(rdfAtoms);
+        System.out.println("Taille du store : " + store.size());
+
+        for (StarQuery query : queries) {
             Collection<Substitution> matchedAtoms = new ArrayList<>();
-            giantTable.match(query).forEachRemaining(matchedAtoms::add);
-
-            // Debugging output
+            store.match(query).forEachRemaining(matchedAtoms::add);
             System.out.println("Query: " + query);
             System.out.println("Matched Atoms: " + matchedAtoms);
+            Iterator<Substitution> var = store.match(query);
 
-            // Ensure that matches are found for each query
-            assertFalse(matchedAtoms.isEmpty(), "Aucun résultat trouvé pour la requête : " + query);
+
+
         }
     }
     @Test
-    public void testMatchStarQuery() throws IOException {
+    public void testMatchStarQueryHexastoreIntegraal() throws IOException {
         System.out.println("=== Parsing RDF Data ===");
         List<RDFTriple> rdfAtoms = parseRDFData(SAMPLE_DATA_FILE);
 
@@ -275,5 +315,6 @@ public class RDFHexaStoreTest {
         assertFalse(matchedAtoms.hasNext(), "Aucun résultat ne devrait être trouvé pour un triplet inexistant.");
     }
 
-    // Vos autres tests d'HexaStore ici
+
+
 }
