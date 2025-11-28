@@ -11,6 +11,7 @@
 		<junit-jupiter-version>5.10.2</junit-jupiter-version>
 		<mockito-version>5.3.1</mockito-version>
 		<integraal-version>1.7.2</integraal-version>
+        <mapdb-version>3.1.0</mapdb-version>
 	</properties>
 
 	<build>
@@ -200,6 +201,11 @@
 			<artifactId>mockito-junit-jupiter</artifactId>
 			<version>${mockito-version}</version>
 		</dependency>
+        <dependency>
+            <groupId>org.mapdb</groupId>
+            <artifactId>mapdb</artifactId>
+            <version>${mapdb-version}</version>
+        </dependency>
 
 	</dependencies>
 

@@ -1,11 +1,11 @@
 package qengine.storage;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
+import java.lang.reflect.Array;
+import java.util.*;
 import java.util.stream.Stream;
 
 import fr.boreal.model.logicalElements.api.Substitution;
+import fr.lirmm.graphik.graal.api.core.AtomComparator;
 import qengine.model.RDFTriple;
 import qengine.model.StarQuery;
 import qengine.utils;
@@ -40,12 +40,13 @@ public interface RDFStorage {
             q.getCentralVariable();
             RDFTriple triple = q.getRdfAtoms().getFirst();
             Iterator<Substitution> it = match(triple);
-            for (int i = 1; i < q.getRdfAtoms().size() && it.hasNext(); i++) {
-                RDFTriple t = q.getRdfAtoms().get(i);
+            List<RDFTriple> sortedAtoms = sortAtoms(q.getRdfAtoms());
+            for (int i = 1; i < sortedAtoms.size() && it.hasNext(); i++) {
+                RDFTriple t = sortedAtoms.get(i);
                 Iterator<Substitution> it2 = match(t);
                 if (!it2.hasNext()) {
                     it = new ArrayList<Substitution>().iterator();
-                    continue;
+                    break;
                 }
                 it = utils.intersectTwoIterators(it, it2);
             }
@@ -56,12 +57,24 @@ public interface RDFStorage {
         }
     }
 
+    default List<RDFTriple> sortAtoms(List<RDFTriple> atomsList){
+        atomsList.sort(new Comparator<RDFTriple>() {
+            @Override
+            public int compare(RDFTriple o1, RDFTriple o2) {
+                return Long.compare(howMany(o1), howMany(o2));
+            }
+        });
+        return atomsList;
+    }
 
     /**
      * @param a atom
      * @return
      */
-    long howMany(RDFTriple a);
+
+    default long howMany(RDFTriple a){
+        return -1;
+    }
 
 
     /**

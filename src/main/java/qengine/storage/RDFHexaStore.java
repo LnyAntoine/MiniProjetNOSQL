@@ -2,11 +2,13 @@ package qengine.storage;
 
 import fr.boreal.model.logicalElements.api.*;
 import fr.boreal.model.logicalElements.impl.SubstitutionImpl;
-import org.apache.commons.lang3.NotImplementedException;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
 import qengine.model.RDFTriple;
 import qengine.model.StarQuery;
-import qengine.utils ;
+
 import java.util.*;
+
 
 /**
  * Implémentation d'un HexaStore pour stocker des RDFAtom.
@@ -21,17 +23,50 @@ public class RDFHexaStore implements RDFStorage {
     private Map<Integer,Map<Integer,Set<Integer>>> POS;
     private Map<Integer,Map<Integer,Set<Integer>>> OSP;
     private Map<Integer,Map<Integer,Set<Integer>>> OPS;
-    private Dictionnaire dictionnaire;
 
+    private Map<Integer,Long> statisticS;
+    private Map<Integer,Long> statisticP;
+    private Map<Integer,Long> statisticO;
+    private Map<Integer,Map<Integer,Long>> statisticSP;
+    private Map<Integer,Map<Integer,Long>> statisticSO;
+    private Map<Integer,Map<Integer,Long>> statisticPS;
+    private Map<Integer,Map<Integer,Long>> statisticPO;
+    private Map<Integer,Map<Integer,Long>> statisticOP;
+    private Map<Integer,Map<Integer,Long>> statisticOS;
+
+    private Dictionnaire dictionnaire;
+    private DB db;
 
     public RDFHexaStore() {
+
         dictionnaire = new Dictionnaire();
+        db = DBMaker.memoryDB().make();
+
         SPO = new HashMap<>();
         SOP = new HashMap<>();
         PSO = new HashMap<>();
         POS = new HashMap<>();
         OSP = new HashMap<>();
         OPS = new HashMap<>();
+
+        /*
+        SPO = db.treeMap("SPO", Serializer.INTEGER, Serializer.JAVA).createOrOpen();
+        SOP = db.treeMap("SOP", Serializer.INTEGER, Serializer.JAVA).createOrOpen();
+        PSO = db.treeMap("PSO", Serializer.INTEGER, Serializer.JAVA).createOrOpen();
+        POS = db.treeMap("POS", Serializer.INTEGER, Serializer.JAVA).createOrOpen();
+        OSP = db.treeMap("OSP", Serializer.INTEGER, Serializer.JAVA).createOrOpen();
+        OPS = db.treeMap("OPS", Serializer.INTEGER, Serializer.JAVA).createOrOpen();
+         */
+
+        statisticS = new HashMap<>();
+        statisticP = new HashMap<>();
+        statisticO = new HashMap<>();
+        statisticSP = new HashMap<>();
+        statisticSO = new HashMap<>();
+        statisticPS = new HashMap<>();
+        statisticPO = new HashMap<>();
+        statisticOP = new HashMap<>();
+        statisticOS = new HashMap<>();
     }
 
     public void addSPO(Integer s, Integer p, Integer o) {
@@ -44,6 +79,8 @@ public class RDFHexaStore implements RDFStorage {
         Set<Integer> set = SPO.get(s).get(p);
         set.add(o);
         SPO.get(s).put(p,set);
+
+
     }
     public void addSOP(Integer s, Integer p, Integer o) {
         if (!SOP.containsKey(s)) {
@@ -131,7 +168,41 @@ public class RDFHexaStore implements RDFStorage {
         addOSP(s, p, o);
         addPSO(s, p, o);
 
+        addToSimpleStatistic(statisticS,s);
+        addToSimpleStatistic(statisticP,p);
+        addToSimpleStatistic(statisticO,o);
+
+        addToDoubleStatistic(statisticSP,s,p);
+        addToDoubleStatistic(statisticSO,s,o);
+        addToDoubleStatistic(statisticOP,o,p);
+        addToDoubleStatistic(statisticOS,o,s);
+        addToDoubleStatistic(statisticPO,p,o);
+        addToDoubleStatistic(statisticPS,p,s);
+
         return true;
+    }
+
+    private void addToSimpleStatistic(Map<Integer,Long> db,
+                                      Integer fstVal){
+
+        if (!db.containsKey(fstVal)){
+            db.put(fstVal,0L);
+        }
+        db.put(fstVal,
+                db.get(fstVal)+1);
+    }
+
+    private void addToDoubleStatistic(Map<Integer,Map<Integer,Long>> doubleDb,
+                                      Integer fstVal, Integer sndVal){
+        if (!doubleDb.containsKey(fstVal)){
+            doubleDb.put(fstVal,new HashMap<>());
+        }
+        if (!doubleDb.get(fstVal).containsKey(sndVal)){
+            doubleDb.get(fstVal).put(sndVal,0L);
+        }
+        doubleDb.get(fstVal).put(sndVal,
+                doubleDb.get(fstVal).get(sndVal) + 1
+                );
     }
 
     @Override
@@ -199,12 +270,61 @@ public class RDFHexaStore implements RDFStorage {
         return RDFStorage.super.match(q);
     }
 
+
+
     @Override
     public long howMany(RDFTriple triple) {
-
-
-
-        throw new NotImplementedException();
+        Term s =  triple.getTerm(0);
+        Term p = triple.getTerm(1);
+        Term o = triple.getTerm(2);
+        if (s.isVariable() && p.isVariable() && o.isVariable()) {
+            //TODO return dict size
+            return -1;
+        }
+        Integer sEncode = dictionnaire.getEncodage(s);
+        Integer pEncode = dictionnaire.getEncodage(p);
+        Integer oEncode = dictionnaire.getEncodage(o);
+        Long howmany = 0L;
+        //sEncode, pEncode et oEncode sont == -1 si variable ou si pas dans la base de donnée
+        if (!sEncode.equals(-1)) {
+            if (!pEncode.equals(-1)) {
+                if (!oEncode.equals(-1)) {
+                    howmany = SPO.get(sEncode)!=null
+                            ? SPO.get(sEncode).get(pEncode)!=null
+                                ? SPO.get(sEncode).get(pEncode).contains(oEncode)
+                                    ? 1L
+                                    :0L
+                                : 0L
+                            :0L;
+                } else {
+                    howmany = statisticSP.get(sEncode)!=null
+                            ? statisticSP.get(sEncode).get(pEncode)!=null
+                                ? statisticSP.get(sEncode).get(oEncode)
+                                : 0
+                            :0;
+                }
+            }
+            else {
+                howmany = statisticS.get(sEncode)!=null
+                        ? statisticS.get(sEncode)
+                        : 0;
+            }
+        } else {
+            if (!pEncode.equals(-1)) {
+                if (!oEncode.equals(-1)) {
+                    howmany = statisticPO.get(pEncode)!=null
+                    ? statisticPO.get(pEncode).get(oEncode)!=null
+                            ? statisticPO.get(pEncode).get(oEncode)
+                            : 0
+                    : 0;
+                }
+            } else {
+                howmany = statisticP.get(pEncode)!=null
+                ? statisticP.get(pEncode)
+                : 0;
+            }
+        }
+        return howmany;
     }
 
     @Override

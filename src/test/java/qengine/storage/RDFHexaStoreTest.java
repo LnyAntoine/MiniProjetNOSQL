@@ -97,7 +97,7 @@ public class RDFHexaStoreTest {
 
         assertTrue(store.add(rdfAtom1), "Le RDFAtom1 devrait être ajouté avec succès.");
         assertTrue(store.add(rdfAtom2), "Le RDFAtom2 devrait être ajouté avec succès.");
-        assertTrue(store.size() == 1, "Taille devrait être égale à 1");
+        assertEquals(1, store.size(), "Taille devrait être égale à 1");
 
     }
 
