@@ -144,6 +144,36 @@ public class RDFHexaStoreTest {
 
         // Other cases
     }
+    @Test
+    public void testMatchAtomGiantTable() {
+        RDFStorage store = new GiantTableStore();
+        store.add(new RDFTriple(SUBJECT_1, PREDICATE_1, OBJECT_1)); // RDFAtom(subject1, triple, object1)
+        store.add(new RDFTriple(SUBJECT_2, PREDICATE_1, OBJECT_2)); // RDFAtom(subject2, triple, object2)
+        store.add(new RDFTriple(SUBJECT_1, PREDICATE_1, OBJECT_3)); // RDFAtom(subject1, triple, object3)
+
+        // Case 1
+        RDFTriple matchingAtom = new RDFTriple(SUBJECT_1, PREDICATE_1, VAR_X); // RDFAtom(subject1, predicate1, X)
+        Iterator<Substitution> matchedAtoms = store.match(matchingAtom);
+        System.out.println("matchedAtoms");
+        System.out.println(matchedAtoms);
+        List<Substitution> matchedList = new ArrayList<>();
+        matchedAtoms.forEachRemaining(matchedList::add);
+
+        Substitution firstResult = new SubstitutionImpl();
+        firstResult.add(VAR_X, OBJECT_1);
+        Substitution secondResult = new SubstitutionImpl();
+        secondResult.add(VAR_X, OBJECT_3);
+        System.out.println(matchedList.size());
+        System.out.println(firstResult);
+        System.out.println(secondResult);
+        System.out.println(matchedList);
+
+        assertEquals(2, matchedList.size(), "There should be two matched RDFAtoms");
+        assertTrue(matchedList.contains(secondResult), "Missing substitution: " + firstResult);
+        assertTrue(matchedList.contains(secondResult), "Missing substitution: " + secondResult);
+
+        // Other cases
+    }
 
     @Test
     public void testMatchStarQuery() {

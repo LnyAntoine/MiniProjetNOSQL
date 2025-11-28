@@ -314,7 +314,7 @@ public class RDFHexaStore implements RDFStorage {
         return atoms;
     }
 
-    private ArrayList<Substitution> matchAll(Term s, Term p, Term o){;
+    private ArrayList<Substitution> matchAll(Term s, Term p, Term o){
         ArrayList<Substitution> substitutions = new ArrayList<>();
         if (!s.isVariable() || !p.isVariable() || !o.isVariable()) {
             return substitutions;
