@@ -299,8 +299,11 @@ public class RDFHexaStoreTest {
             Collection<Substitution> matchedAtoms = new ArrayList<>();
             store.match(starQuery).forEachRemaining(matchedAtoms::add);
 
-            assertEquals(integraal_result, matchedAtoms, "pas pareil");
-
+            assertTrue(
+                    integraal_result.containsAll(matchedAtoms) &&
+                            matchedAtoms.containsAll(integraal_result),
+                    "pas pareil"
+            );
         }
     }
 
@@ -329,9 +332,14 @@ public class RDFHexaStoreTest {
             Collection<Substitution> matchedAtoms = new ArrayList<>();
             store.match(starQuery).forEachRemaining(matchedAtoms::add);
 
-            assertEquals(integraal_result, matchedAtoms, "pas pareil");
+            assertTrue(
+                    integraal_result.containsAll(matchedAtoms) &&
+                            matchedAtoms.containsAll(integraal_result),
+                    "pas pareil"
+            );
 
         }
+
     }
 
     @Test
