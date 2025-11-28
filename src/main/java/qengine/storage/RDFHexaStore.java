@@ -17,30 +17,22 @@ import java.util.*;
  * (Prédicat, Sujet, Objet), (Prédicat, Objet, Sujet), (Objet, Sujet, Prédicat) et (Objet, Prédicat, Sujet).
  */
 public class RDFHexaStore implements RDFStorage {
-    /*
-    private Map<Integer,Map<Integer,Set<Integer>>> SPO;
-    private Map<Integer,Map<Integer,Set<Integer>>> SOP;
-    private Map<Integer,Map<Integer,Set<Integer>>> PSO;
-    private Map<Integer,Map<Integer,Set<Integer>>> POS;
-    private Map<Integer,Map<Integer,Set<Integer>>> OSP;
-    private Map<Integer,Map<Integer,Set<Integer>>> OPS;
-     */
-    private Map<Integer,SndValue> SPO;
-    private Map<Integer,SndValue> POS;
-    private Map<Integer,SndValue> SOP;
-    private Map<Integer,SndValue> PSO;
-    private Map<Integer,SndValue> OSP;
-    private Map<Integer,SndValue> OPS;
+    private final Map<Integer,SndValue> SPO;
+    private final Map<Integer,SndValue> POS;
+    private final Map<Integer,SndValue> SOP;
+    private final Map<Integer,SndValue> PSO;
+    private final Map<Integer,SndValue> OSP;
+    private final Map<Integer,SndValue> OPS;
 
 
 
-    private Dictionnaire dictionnaire;
-    private DB db;
+    private final Dictionnaire dictionnaire;
+    //private DB db;
 
     public RDFHexaStore() {
 
         dictionnaire = new Dictionnaire();
-        db = DBMaker.memoryDB().make();
+        //db = DBMaker.memoryDB().make();
 
         SPO = new HashMap<>();
         SOP = new HashMap<>();
@@ -49,14 +41,6 @@ public class RDFHexaStore implements RDFStorage {
         OSP = new HashMap<>();
         OPS = new HashMap<>();
 
-        /*
-        SPO = db.treeMap("SPO", Serializer.INTEGER, Serializer.JAVA).createOrOpen();
-        SOP = db.treeMap("SOP", Serializer.INTEGER, Serializer.JAVA).createOrOpen();
-        PSO = db.treeMap("PSO", Serializer.INTEGER, Serializer.JAVA).createOrOpen();
-        POS = db.treeMap("POS", Serializer.INTEGER, Serializer.JAVA).createOrOpen();
-        OSP = db.treeMap("OSP", Serializer.INTEGER, Serializer.JAVA).createOrOpen();
-        OPS = db.treeMap("OPS", Serializer.INTEGER, Serializer.JAVA).createOrOpen();
-         */
     }
 
     public void addGeneric(Map<Integer,SndValue> map, Integer fst, Integer snd, Integer thrd) {
@@ -255,7 +239,7 @@ public class RDFHexaStore implements RDFStorage {
         Integer sEncode = dictionnaire.getEncodage(s);
         Integer pEncode = dictionnaire.getEncodage(p);
         Integer oEncode = dictionnaire.getEncodage(o);
-        Long howmany = 0L;
+        long howmany = 0L;
         //sEncode, pEncode et oEncode sont == -1 si variable ou si pas dans la base de donnée
         if (!sEncode.equals(-1)) {
             if (!pEncode.equals(-1)) {
@@ -280,13 +264,13 @@ public class RDFHexaStore implements RDFStorage {
                 if (!oEncode.equals(-1)) {
                     howmany = SOP.get(sEncode)!=null
                             ? SOP.get(sEncode).map.get(oEncode)!=null
-                                ? (long) SOP.get(sEncode).map.get(oEncode).stat
+                                ? SOP.get(sEncode).map.get(oEncode).stat
                                 : 0L
                             :0L;
                 }
                 else {
                     howmany = SOP.get(sEncode)!=null
-                            ? (long) SOP.get(sEncode).map.get(-1).stat
+                            ? SOP.get(sEncode).map.get(-1).stat
                             : 0L;
                 }
 
@@ -296,14 +280,14 @@ public class RDFHexaStore implements RDFStorage {
                 if (!oEncode.equals(-1)) {
                     howmany = POS.get(pEncode)!=null
                             ? POS.get(pEncode).map.get(oEncode)!=null
-                                ? (long) POS.get(pEncode).map.get(oEncode).stat
+                                ? POS.get(pEncode).map.get(oEncode).stat
                                 : 0L
                             :0L;
                 }
             } else {
                 if (!oEncode.equals(-1)) {
                     howmany = OPS.get(oEncode)!=null
-                            ? (long) OPS.get(oEncode).map.get(-1).stat
+                            ? OPS.get(oEncode).map.get(-1).stat
                             : 0L;
                 }
             }
