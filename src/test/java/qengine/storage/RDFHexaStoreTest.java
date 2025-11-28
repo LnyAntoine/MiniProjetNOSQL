@@ -35,8 +35,8 @@ public class RDFHexaStoreTest {
     private static final Variable VAR_X = SameObjectTermFactory.instance().createOrGetVariable("?x");
     private static final Variable VAR_Y = SameObjectTermFactory.instance().createOrGetVariable("?y");
     private static final String WORKING_DIR = "data/";
-    private static final String SAMPLE_DATA_FILE = WORKING_DIR + "sample_data.nt";
-    private static final String SAMPLE_QUERY_FILE = WORKING_DIR + "sample_query.queryset";
+    private static final String SAMPLE_DATA_FILE = WORKING_DIR + "100K.nt";
+    private static final String SAMPLE_QUERY_FILE = WORKING_DIR + "STAR_ALL_workload.queryset";
     private static final String SAMPLE_FILE = WORKING_DIR + "sample_data.nt";
 
     @Test
@@ -205,7 +205,7 @@ public class RDFHexaStoreTest {
     }
     @Test
     public void testMatchAtomGiantTable() {
-        GiantTableStore store = new GiantTableStore();
+        RDFStorage store = new GiantTableStore();
         store.add(new RDFTriple(SUBJECT_1, PREDICATE_1, OBJECT_1)); // RDFAtom(subject1, triple, object1)
         store.add(new RDFTriple(SUBJECT_2, PREDICATE_1, OBJECT_2)); // RDFAtom(subject2, triple, object2)
         store.add(new RDFTriple(SUBJECT_1, PREDICATE_1, OBJECT_3)); // RDFAtom(subject1, triple, object3)
@@ -213,8 +213,10 @@ public class RDFHexaStoreTest {
 
         RDFTriple matchingAtom = new RDFTriple(SUBJECT_1, PREDICATE_1, VAR_X); // RDFAtom(subject1, predicate1, X)
         Iterator<Substitution> matchedAtoms = store.match(matchingAtom);
-        System.out.println("matchedAtoms");
-        System.out.println(matchedAtoms);
+        System.out.println("matchedAtoms"+ matchedAtoms);
+
+        System.out.println("sotre size:\n" + store.size());
+
         List<Substitution> matchedList = new ArrayList<>();
         matchedAtoms.forEachRemaining(matchedList::add);
 
@@ -266,7 +268,7 @@ public class RDFHexaStoreTest {
             store.match(query).forEachRemaining(matchedAtoms::add);
             System.out.println("Query: " + query);
             System.out.println("Matched Atoms: " + matchedAtoms);
-            Iterator<Substitution> var = store.match(query);
+            assertFalse(matchedAtoms.isEmpty(), "Aucun résultat trouvé pour la requête : " + query);
 
 
 
@@ -281,6 +283,36 @@ public class RDFHexaStoreTest {
         List<StarQuery> starQueries = parseSparQLQueries(SAMPLE_QUERY_FILE);
 
         RDFHexaStore store = new RDFHexaStore();
+        FactBase factBase = new SimpleInMemoryGraphStore();
+
+        //stockage dans Hexastore
+        store.addAll(rdfAtoms);
+        //stockage dasn Integraal
+        for (RDFTriple triple : rdfAtoms) {
+            factBase.add(triple);  // Stocker chaque RDFAtom dans le store
+        }
+
+        for (StarQuery starQuery : starQueries) {
+            Collection<Substitution> integraal_result = new ArrayList<>();
+            executeStarQuery(starQuery, factBase).forEachRemaining(integraal_result::add);
+
+            Collection<Substitution> matchedAtoms = new ArrayList<>();
+            store.match(starQuery).forEachRemaining(matchedAtoms::add);
+
+            assertEquals(integraal_result, matchedAtoms, "pas pareil");
+
+        }
+    }
+
+    @Test
+    public void testMatchStarQueryGiantTableIntegraal() throws IOException {
+        System.out.println("=== Parsing RDF Data ===");
+        List<RDFTriple> rdfAtoms = parseRDFData(SAMPLE_DATA_FILE);
+
+        System.out.println("\n=== Parsing Sample Queries ===");
+        List<StarQuery> starQueries = parseSparQLQueries(SAMPLE_QUERY_FILE);
+
+        RDFStorage store = new GiantTableStore();
         FactBase factBase = new SimpleInMemoryGraphStore();
 
         //stockage dans Hexastore

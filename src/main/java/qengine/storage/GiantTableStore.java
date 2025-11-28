@@ -40,9 +40,11 @@ public class GiantTableStore implements RDFStorage{
     @Override
     public Iterator<Substitution> match(RDFTriple a) {
         List<Substitution> substitutions = new ArrayList<>();
+        a = dictionnaire.encodeTripleQuery(a);
         for (RDFTriple triple : storage) {
             Substitution s = matchTriple(a, triple);
             if (s!=null) {
+                System.out.println("match found: " + s);
                 substitutions.add(s);
             }
         }
@@ -52,15 +54,18 @@ public class GiantTableStore implements RDFStorage{
     public Substitution matchTriple(RDFTriple request, RDFTriple triple) {
         Substitution s = new SubstitutionImpl();
 
+        System.out.println("Matching request: " + request + " with triple: " + triple);
         for (int i = 0; i < 3; i++) {
             Term termReq = request.getTerm(i);
             Term termDb = triple.getTerm(i);
 
             if (termReq.isVariable()) {
-                s.add((Variable) termReq, termDb);
+                s.add((Variable) termReq, dictionnaire.getDecodageAsTerm(Integer.parseInt(termDb.label())));
+
 
             } else {
                 if (!termReq.equals(termDb)) {
+                    System.out.println("no match on term: " + termReq + " vs " + termDb);
                     return null; // pas le même terme → pas de match
                 }
             }
