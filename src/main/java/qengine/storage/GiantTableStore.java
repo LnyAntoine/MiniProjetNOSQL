@@ -6,6 +6,7 @@ import fr.boreal.model.logicalElements.api.Variable;
 import fr.boreal.model.logicalElements.factory.api.TermFactory;
 import fr.boreal.model.logicalElements.factory.impl.SameObjectTermFactory;
 import fr.boreal.model.logicalElements.impl.SubstitutionImpl;
+import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import qengine.model.RDFTriple;
 import qengine.model.StarQuery;
 
@@ -62,7 +63,7 @@ public class GiantTableStore implements RDFStorage{
 
     @Override
     public Iterator<Substitution> match(StarQuery q) {
-        return null;
+        return RDFStorage.super.match(q);
     }
 
     @Override
@@ -72,7 +73,11 @@ public class GiantTableStore implements RDFStorage{
 
     @Override
     public long size() {
-        return 0;
+        int size = 0;
+        for (RDFTriple triple : storage) {
+            size++;
+        }
+        return size;
     }
 
     @Override

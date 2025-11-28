@@ -150,14 +150,8 @@ public class RDFHexaStore implements RDFStorage {
     public long size() {
 /*        if (checkSynchronization()) return SPO.size();
         else return -1;*/
-        System.out.println(sizeStore(SOP));
-        System.out.println(sizeStore(SPO));
-        System.out.println(sizeStore(PSO));
-        System.out.println(sizeStore(OPS));
-        System.out.println(sizeStore(OSP));
-        System.out.println(sizeStore(POS));
-
-        return SPO.size();
+        if (checkSynchronization()) return sizeStore(SPO);
+        else return -1;
     }
 
     @Override
@@ -221,8 +215,6 @@ public class RDFHexaStore implements RDFStorage {
 
     @Override
     public long howMany(RDFTriple triple) {
-
-
 
         throw new NotImplementedException();
     }
@@ -431,11 +423,11 @@ public class RDFHexaStore implements RDFStorage {
     }
 
     private boolean checkSynchronization() {
-        return SPO.size()== POS.size() &&
-                SPO.size() == SOP.size() &&
-                SPO.size() == OPS.size() &&
-                SPO.size() == OSP.size() &&
-                SPO.size() == PSO.size();
+        return sizeStore(SPO)== sizeStore(POS) &&
+                sizeStore(POS) == sizeStore(SOP) &&
+                sizeStore(SOP) == sizeStore(PSO) &&
+                sizeStore(PSO) == sizeStore(OPS) &&
+                sizeStore(OPS) == sizeStore(OSP);
     }
 
 

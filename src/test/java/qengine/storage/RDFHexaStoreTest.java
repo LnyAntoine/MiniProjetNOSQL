@@ -112,6 +112,47 @@ public class RDFHexaStoreTest {
         // Ajouter plusieurs RDFAtom
         RDFTriple rdfAtom1 = new RDFTriple(SUBJECT_1, PREDICATE_1, OBJECT_1);
         RDFTriple rdfAtom2 = new RDFTriple(SUBJECT_2, PREDICATE_2, OBJECT_2);
+
+        assertTrue(store.add(rdfAtom1), "Le RDFAtom1 devrait être ajouté avec succès.");
+        assertTrue(store.add(rdfAtom2), "Le RDFAtom2 devrait être ajouté avec succès.");
+        assertTrue(store.size() == 2, "Taille devrait être à égale à 2");
+    }
+    @Test
+    public void testSizeWithSameS() {
+        RDFHexaStore store = new RDFHexaStore();
+
+        // Version stream
+        // Ajouter plusieurs RDFAtom
+        RDFTriple rdfAtom1 = new RDFTriple(SUBJECT_1, PREDICATE_1, OBJECT_1);
+        RDFTriple rdfAtom2 = new RDFTriple(SUBJECT_1, PREDICATE_2, OBJECT_2);
+
+        assertTrue(store.add(rdfAtom1), "Le RDFAtom1 devrait être ajouté avec succès.");
+        assertTrue(store.add(rdfAtom2), "Le RDFAtom2 devrait être ajouté avec succès.");
+        assertTrue(store.size() == 2, "Taille devrait être à égale à 2");
+    }
+    @Test
+    public void testSizeWithSameSP() {
+        RDFHexaStore store = new RDFHexaStore();
+
+        // Version stream
+        // Ajouter plusieurs RDFAtom
+        RDFTriple rdfAtom1 = new RDFTriple(SUBJECT_1, PREDICATE_1, OBJECT_1);
+        RDFTriple rdfAtom2 = new RDFTriple(SUBJECT_1, PREDICATE_1, OBJECT_2);
+
+        assertTrue(store.add(rdfAtom1), "Le RDFAtom1 devrait être ajouté avec succès.");
+        assertTrue(store.add(rdfAtom2), "Le RDFAtom2 devrait être ajouté avec succès.");
+        assertTrue(store.size() == 2, "Taille devrait être à égale à 2");
+    }
+
+    @Test
+    public void testSizeWithSameP() {
+        RDFHexaStore store = new RDFHexaStore();
+
+        // Version stream
+        // Ajouter plusieurs RDFAtom
+        RDFTriple rdfAtom1 = new RDFTriple(SUBJECT_1, PREDICATE_1, OBJECT_1);
+        RDFTriple rdfAtom2 = new RDFTriple(SUBJECT_2, PREDICATE_1, OBJECT_2);
+
         assertTrue(store.add(rdfAtom1), "Le RDFAtom1 devrait être ajouté avec succès.");
         assertTrue(store.add(rdfAtom2), "Le RDFAtom2 devrait être ajouté avec succès.");
         assertTrue(store.size() == 2, "Taille devrait être à égale à 2");
@@ -149,25 +190,48 @@ public class RDFHexaStoreTest {
     }
 
     @Test
-    public void testMatchAtom2() throws IOException{
+    public void testMatchAtom2() throws IOException {
         List<RDFTriple> rdfAtoms = parseRDFData(SAMPLE_DATA_FILE);
 
         List<StarQuery> queries = parseSparQLQueries(SAMPLE_QUERY_FILE);
 
-
         RDFHexaStore store = new RDFHexaStore();
         store.addAll(rdfAtoms);
-        store.size(); //y'a pas bien les 20 triplets
-        for (RDFTriple triple : rdfAtoms) {
-            System.out.println(triple);
-            Iterator<Substitution> matchedAtoms = store.match(triple);
-            List<Substitution> matchedList = new ArrayList<>();
-            matchedAtoms.forEachRemaining(matchedList::add);
 
-            assertEquals(rdfAtoms, matchedAtoms, "pas pareil");
+        for (StarQuery query : queries) {
+            Collection<Substitution> matchedAtoms = new ArrayList<>();
+            store.match(query).forEachRemaining(matchedAtoms::add);
+            System.out.println("Query: " + query);
+            System.out.println("Matched Atoms: " + matchedAtoms);
+
+            assertFalse(matchedAtoms.isEmpty(), "Aucun résultat trouvé pour la requête : " + query);
         }
     }
+    @Test
+    public void testMatchAtom2WithGiantTable() throws IOException {
+        // Parse RDF triples from the data file
+        List<RDFTriple> rdfAtoms = parseRDFData(SAMPLE_DATA_FILE);
 
+        // Initialize the GiantTable and add all RDF triples
+        GiantTableStore giantTable = new GiantTableStore();
+        for (RDFTriple rdfAtom : rdfAtoms) {
+            giantTable.add(rdfAtom);
+        }
+
+        System.out.println(giantTable.size());
+        // Iterate over the RDF triples and use them as queries
+        for (RDFTriple query : rdfAtoms) {
+            Collection<Substitution> matchedAtoms = new ArrayList<>();
+            giantTable.match(query).forEachRemaining(matchedAtoms::add);
+
+            // Debugging output
+            System.out.println("Query: " + query);
+            System.out.println("Matched Atoms: " + matchedAtoms);
+
+            // Ensure that matches are found for each query
+            assertFalse(matchedAtoms.isEmpty(), "Aucun résultat trouvé pour la requête : " + query);
+        }
+    }
     @Test
     public void testMatchStarQuery() throws IOException {
         System.out.println("=== Parsing RDF Data ===");
@@ -196,6 +260,19 @@ public class RDFHexaStoreTest {
             assertEquals(integraal_result, matchedAtoms, "pas pareil");
 
         }
+    }
+
+    @Test
+    public void testMatchNonExistentTriple() {
+        RDFHexaStore store = new RDFHexaStore();
+
+        RDFTriple rdfAtom = new RDFTriple(SUBJECT_1, PREDICATE_1, OBJECT_1);
+        store.add(rdfAtom);
+
+        RDFTriple nonExistentTriple = new RDFTriple(SUBJECT_2, PREDICATE_2, OBJECT_2);
+        Iterator<Substitution> matchedAtoms = store.match(nonExistentTriple);
+
+        assertFalse(matchedAtoms.hasNext(), "Aucun résultat ne devrait être trouvé pour un triplet inexistant.");
     }
 
     // Vos autres tests d'HexaStore ici
