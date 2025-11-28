@@ -2,11 +2,13 @@ package qengine.storage;
 
 import fr.boreal.model.logicalElements.api.*;
 import fr.boreal.model.logicalElements.impl.SubstitutionImpl;
-import org.apache.commons.lang3.NotImplementedException;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
 import qengine.model.RDFTriple;
 import qengine.model.StarQuery;
-import qengine.utils ;
+
 import java.util.*;
+
 
 /**
  * Implémentation d'un HexaStore pour stocker des RDFAtom.
@@ -15,90 +17,94 @@ import java.util.*;
  * (Prédicat, Sujet, Objet), (Prédicat, Objet, Sujet), (Objet, Sujet, Prédicat) et (Objet, Prédicat, Sujet).
  */
 public class RDFHexaStore implements RDFStorage {
-    private Map<Integer,Map<Integer,Set<Integer>>> SPO;
-    private Map<Integer,Map<Integer,Set<Integer>>> SOP;
-    private Map<Integer,Map<Integer,Set<Integer>>> PSO;
-    private Map<Integer,Map<Integer,Set<Integer>>> POS;
-    private Map<Integer,Map<Integer,Set<Integer>>> OSP;
-    private Map<Integer,Map<Integer,Set<Integer>>> OPS;
-    private Dictionnaire dictionnaire;
+    private final Map<Integer,SndValue> SPO;
+    private final Map<Integer,SndValue> POS;
+    private final Map<Integer,SndValue> SOP;
+    private final Map<Integer,SndValue> PSO;
+    private final Map<Integer,SndValue> OSP;
+    private final Map<Integer,SndValue> OPS;
 
+
+
+    private final Dictionnaire dictionnaire;
+    //private DB db;
 
     public RDFHexaStore() {
+
         dictionnaire = new Dictionnaire();
+        //db = DBMaker.memoryDB().make();
+
         SPO = new HashMap<>();
         SOP = new HashMap<>();
         PSO = new HashMap<>();
         POS = new HashMap<>();
         OSP = new HashMap<>();
         OPS = new HashMap<>();
+
     }
 
-    public void addSPO(Integer s, Integer p, Integer o) {
-        if (!SPO.containsKey(s)) {
-            SPO.put(s,new HashMap<>());
+    public void addGeneric(Map<Integer,SndValue> map, Integer fst, Integer snd, Integer thrd) {
+
+        if (!map.containsKey(fst)) {
+            HashMap<Integer,ThrdValue> fstValueHashMap = new HashMap<>();
+            fstValueHashMap.put(-1,new ThrdValue(0L));
+            map.put(fst,new SndValue(fstValueHashMap));
+            map.put(-1,new SndValue(0L));
+
         }
-        if (!SPO.get(s).containsKey(p)){
-            SPO.get(s).put(p,new HashSet<>());
+        if (!map.get(fst).map.containsKey(snd)){
+            HashSet <Integer> set = new HashSet<>();
+            map.get(fst).map.put(snd,new ThrdValue(set));
+            map.get(fst).map.put(-1,new ThrdValue(0L)); //Nombre de snd pour ce fst
+
         }
-        Set<Integer> set = SPO.get(s).get(p);
-        set.add(o);
-        SPO.get(s).put(p,set);
+
+        Set<Integer> set = map.get(fst).map.get(snd).set;
+        set.add(thrd);
+        map.get(fst).map.put(snd,new ThrdValue(set));
+        map.get(fst).map.put(-1,new ThrdValue(map.get(fst).map.get(-1).stat + 1)); //Incrémenter le nombre de snd pour ce fst
     }
-    public void addSOP(Integer s, Integer p, Integer o) {
-        if (!SOP.containsKey(s)) {
-            SOP.put(s,new HashMap<>());
+
+    public ArrayList<Substitution> matchGeneric(Map<Integer,SndValue> map, Term fst, Term snd, Term thrd) {
+        ArrayList<Substitution> substitutions = new ArrayList<>();
+        if (fst == null || snd == null || thrd == null) {
+            return substitutions;
         }
-        if (!SOP.get(s).containsKey(o)){
-            SOP.get(s).put(o,new HashSet<>());
+        if (!fst.isLiteral()) {
+            return matchAll(fst, snd, thrd);
         }
-        Set<Integer> set = SOP.get(s).get(o);
-        set.add(p);
-        SOP.get(s).put(o,set);
-    }
-    public void addPOS(Integer s, Integer p, Integer o) {
-        if (!POS.containsKey(p)) {
-            POS.put(p,new HashMap<>());
+
+        Map<Integer, ThrdValue> snd_thrd_map =
+                map.get(Integer.parseInt(fst.label())) != null
+                        ? map.get(Integer.parseInt(fst.label())).map
+                        : new HashMap<>();
+        if (snd_thrd_map.isEmpty()) {
+            return substitutions;
         }
-        if (!POS.get(p).containsKey(o)){
-            POS.get(p).put(o,new HashSet<>());
+        if (snd.isLiteral()) {
+            Set<Integer> thrd_set = snd_thrd_map.get(Integer.parseInt(snd.label())) != null
+                    ? snd_thrd_map.get(Integer.parseInt(snd.label())).set
+                    : new HashSet<>();
+            if (thrd_set.isEmpty()) {
+                return substitutions;
+            }
+            for (Integer i : thrd_set) {
+                Substitution sub = new SubstitutionImpl();
+                sub.add((Variable) thrd, dictionnaire.getDecodageAsTerm(i));
+                substitutions.add(sub);
+            }
+        } else {
+            for (Integer is : snd_thrd_map.keySet()) {
+                Set<Integer> thrd_set = snd_thrd_map.get(is).set;
+                for (Integer io : thrd_set) {
+                    Substitution sub = new SubstitutionImpl();
+                    sub.add((Variable) snd, dictionnaire.getDecodageAsTerm(is));
+                    sub.add((Variable) thrd, dictionnaire.getDecodageAsTerm(io));
+                    substitutions.add(sub);
+                }
+            }
         }
-        Set<Integer> set = POS.get(p).get(o);
-        set.add(s);
-        POS.get(p).put(o,set);
-    }
-    public void addPSO(Integer s, Integer p, Integer o) {
-        if (!PSO.containsKey(p)) {
-            PSO.put(p,new HashMap<>());
-        }
-        if (!PSO.get(p).containsKey(s)){
-            PSO.get(p).put(s,new HashSet<>());
-        }
-        Set<Integer> set = PSO.get(p).get(s);
-        set.add(o);
-        PSO.get(p).put(s,set);
-    }
-    public void addOSP(Integer s, Integer p, Integer o) {
-        if (!OSP.containsKey(o)) {
-            OSP.put(o,new HashMap<>());
-        }
-        if (!OSP.get(o).containsKey(s)){
-            OSP.get(o).put(s,new HashSet<>());
-        }
-        Set<Integer> set = OSP.get(o).get(s);
-        set.add(p);
-        OSP.get(o).put(s,set);
-    }
-    public void addOPS(Integer s, Integer p, Integer o) {
-        if (!OPS.containsKey(o)) {
-            OPS.put(o,new HashMap<>());
-        }
-        if (!OPS.get(o).containsKey(p)){
-            OPS.get(o).put(p,new HashSet<>());
-        }
-        Set<Integer> set = OPS.get(o).get(p);
-        set.add(s);
-        OPS.get(o).put(p,set);
+        return substitutions;
     }
 
     @Override
@@ -124,6 +130,15 @@ public class RDFHexaStore implements RDFStorage {
         Integer p = Integer.parseInt(triple.getTerms()[1].label());
         Integer o = Integer.parseInt(triple.getTerms()[2].label());
 
+
+        addGeneric(SPO,s,p,o);
+        addGeneric(POS,p,o,s);
+        addGeneric(SOP,s,o,p);
+        addGeneric(OPS,o,p,s);
+        addGeneric(OSP,o,s,p);
+        addGeneric(PSO,p,s,o);
+
+        /*
         addSPO(s, p, o);
         addPOS(s, p, o);
         addSOP(s, p, o);
@@ -131,6 +146,18 @@ public class RDFHexaStore implements RDFStorage {
         addOSP(s, p, o);
         addPSO(s, p, o);
 
+        addToSimpleStatistic(statisticS,s);
+        addToSimpleStatistic(statisticP,p);
+        addToSimpleStatistic(statisticO,o);
+
+        addToDoubleStatistic(statisticSP,s,p);
+        addToDoubleStatistic(statisticSO,s,o);
+        addToDoubleStatistic(statisticOP,o,p);
+        addToDoubleStatistic(statisticOS,o,s);
+        addToDoubleStatistic(statisticPO,p,o);
+        addToDoubleStatistic(statisticPS,p,s);
+
+         */
         return true;
     }
     public int sizeStore(Map<Integer, Map<Integer, Set<Integer>>> map) {
@@ -192,18 +219,19 @@ public class RDFHexaStore implements RDFStorage {
             //Match dans S..
             if (!o.isVariable()) { //S littéral, O littéral, P doit etre variable
                 //Match SOP
-                substitutions = matchSOP(s, p, o);
+                substitutions = matchGeneric(SOP,s,o,p);
             }
             else { //Si S est littéral O est variable, P est donc litteral (sinn géré pas cas de base)
-                substitutions = matchSPO(s, p, o);
+                substitutions = matchGeneric(SPO,s,p,o);
             }
         } else {
             if (!o.isVariable()) {
                 // S est variable, O est littéral, P peut etre littéral donc OPS
-                substitutions = matchOPS(s, p, o);
+                substitutions = matchGeneric(OPS,o, p, s);
             }
             else { //S est variable, O est variable, p doit etre littéral donc PSO
-                substitutions = matchPSO(s, p, o);            }
+                substitutions = matchGeneric(PSO,p,s,o);
+        }
         }
         return substitutions.iterator();
     }
@@ -216,16 +244,78 @@ public class RDFHexaStore implements RDFStorage {
 
     @Override
     public long howMany(RDFTriple triple) {
+        Term s =  triple.getTerm(0);
+        Term p = triple.getTerm(1);
+        Term o = triple.getTerm(2);
+        if (s.isVariable() && p.isVariable() && o.isVariable()) {
+            //TODO return dict size
+            return -1;
+        }
+        Integer sEncode = dictionnaire.getEncodage(s);
+        Integer pEncode = dictionnaire.getEncodage(p);
+        Integer oEncode = dictionnaire.getEncodage(o);
+        long howmany = 0L;
+        //sEncode, pEncode et oEncode sont == -1 si variable ou si pas dans la base de donnée
+        if (!sEncode.equals(-1)) {
+            if (!pEncode.equals(-1)) {
+                if (!oEncode.equals(-1)) {
+                    howmany = SPO.get(sEncode)!=null
+                            ? SPO.get(sEncode).map.get(pEncode)!=null
+                                ? SPO.get(sEncode).map.get(pEncode).set.contains(oEncode)
+                                    ? 1L
+                                    :0L
+                                : 0L
+                            :0L;
+                } else {
+                    howmany = SPO.get(sEncode)!=null
+                            ? SPO.get(sEncode).map.get(pEncode)!=null
+                                ? (long) SPO.get(sEncode).map.get(-1).stat
+                                : 0L
+                            :0L;
 
-        throw new NotImplementedException();
+                }
+            }
+            else {
+                if (!oEncode.equals(-1)) {
+                    howmany = SOP.get(sEncode)!=null
+                            ? SOP.get(sEncode).map.get(oEncode)!=null
+                                ? SOP.get(sEncode).map.get(oEncode).stat
+                                : 0L
+                            :0L;
+                }
+                else {
+                    howmany = SOP.get(sEncode)!=null
+                            ? SOP.get(sEncode).map.get(-1).stat
+                            : 0L;
+                }
+
+            }
+        } else {
+            if (!pEncode.equals(-1)) {
+                if (!oEncode.equals(-1)) {
+                    howmany = POS.get(pEncode)!=null
+                            ? POS.get(pEncode).map.get(oEncode)!=null
+                                ? POS.get(pEncode).map.get(oEncode).stat
+                                : 0L
+                            :0L;
+                }
+            } else {
+                if (!oEncode.equals(-1)) {
+                    howmany = OPS.get(oEncode)!=null
+                            ? OPS.get(oEncode).map.get(-1).stat
+                            : 0L;
+                }
+            }
+        }
+        return howmany;
     }
 
     @Override
     public Collection<RDFTriple> getAtoms() {
         ArrayList<RDFTriple> atoms = new ArrayList<>();
         for (Integer is : SPO.keySet()) {
-            for (Integer ip : SPO.get(is).keySet()) {
-                for (Integer io : SPO.get(is).get(ip)) {
+            for (Integer ip : SPO.get(is).map.keySet()) {
+                for (Integer io : SPO.get(is).map.get(ip).set) {
                     //SameObjectTermFactory.instance().createOrGetLiteral();
                     RDFTriple triple = new RDFTriple(
                             dictionnaire.getDecodageAsTerm(is),
@@ -239,15 +329,15 @@ public class RDFHexaStore implements RDFStorage {
         return atoms;
     }
 
-    private ArrayList<Substitution> matchAll(Term s, Term p, Term o){;
+    private ArrayList<Substitution> matchAll(Term s, Term p, Term o){
         ArrayList<Substitution> substitutions = new ArrayList<>();
         if (!s.isVariable() || !p.isVariable() || !o.isVariable()) {
             return substitutions;
         }
         for (Integer is : SPO.keySet()) {
-            Map<Integer, Set<Integer>> po_hashmap = SPO.get(is);
+            Map<Integer, ThrdValue> po_hashmap = SPO.get(is).map;
             for (Integer ip : po_hashmap.keySet()) {
-                Set<Integer> o_set = po_hashmap.get(ip);
+                Set<Integer> o_set = po_hashmap.get(ip).set;
                 for (Integer io : o_set) {
                     Substitution sub = new SubstitutionImpl();
                     sub.add((Variable) s, dictionnaire.getDecodageAsTerm(is));
@@ -258,168 +348,6 @@ public class RDFHexaStore implements RDFStorage {
             }
         }
 
-        return substitutions;
-    }
-
-    private ArrayList<Substitution> matchSPO(Term s, Term p, Term o){
-        ArrayList<Substitution> substitutions = new ArrayList<>();
-        if (s == null || p == null || o == null) {
-            return substitutions;
-        }
-        if (!s.isLiteral()) {
-            return substitutions;
-        }
-        Map<Integer, Set<Integer>> po_hashmap =
-                SPO.get(Integer.parseInt(s.label()))!=null
-                        ? SPO.get(Integer.parseInt(s.label()))
-                        : new HashMap<>();
-        if (SPO.isEmpty()) {
-            return substitutions;
-        }
-        if (p.isLiteral()) {
-            Set<Integer> o_set = po_hashmap.get(Integer.parseInt(p.label()))!=null
-                    ? po_hashmap.get(Integer.parseInt(p.label()))
-                    : new HashSet<>();
-            if (o_set.isEmpty()) {
-                return substitutions;
-            }
-            for (Integer i : o_set) {
-                Substitution sub = new SubstitutionImpl();
-                sub.add((Variable) o, dictionnaire.getDecodageAsTerm(i));
-                substitutions.add(sub);
-            }
-        }else{
-            for (Integer ip: po_hashmap.keySet()) {
-                Set<Integer> o_set = po_hashmap.get(ip);
-                for (Integer io : o_set) {
-                    Substitution sub = new SubstitutionImpl();
-                    sub.add((Variable) p, dictionnaire.getDecodageAsTerm(ip));
-                    sub.add((Variable) o, dictionnaire.getDecodageAsTerm(io));
-                    substitutions.add(sub);
-                }
-            }
-        }
-        return substitutions;
-    }
-
-    private ArrayList<Substitution> matchSOP(Term s, Term p, Term o){
-        ArrayList<Substitution> substitutions = new ArrayList<>();
-        if (s == null || p == null || o == null) {
-            return substitutions;
-        }
-        if (!s.isLiteral()) {
-            return substitutions;
-        }
-        Map<Integer, Set<Integer>> op_hashmap =  SOP.get(Integer.parseInt(s.label()))!=null?
-                SOP.get(Integer.parseInt(s.label()))
-                : new HashMap<>();
-        if (SOP.isEmpty()) {
-            return substitutions;
-        }
-        if (o.isLiteral()) {
-            Set<Integer> p_set = op_hashmap.get(Integer.parseInt(o.label()))!=null
-                    ? op_hashmap.get(Integer.parseInt(o.label()))
-                    : new HashSet<>();
-            if (p_set.isEmpty()) {
-                return substitutions;
-            }
-            for (Integer i : p_set) {
-                Substitution sub = new SubstitutionImpl();
-                sub.add((Variable) p, dictionnaire.getDecodageAsTerm(i));
-                substitutions.add(sub);
-            }
-        }else{
-            for (Integer io: op_hashmap.keySet()) {
-                Set<Integer> o_set = op_hashmap.get(io);
-                for (Integer ip : o_set) {
-                    Substitution sub = new SubstitutionImpl();
-                    sub.add((Variable) o, dictionnaire.getDecodageAsTerm(io));
-                    sub.add((Variable) p, dictionnaire.getDecodageAsTerm(ip));
-                    substitutions.add(sub);
-                }
-            }
-        }
-        return substitutions;
-    }
-
-    private ArrayList<Substitution> matchOPS(Term s, Term p, Term o){
-        ArrayList<Substitution> substitutions = new ArrayList<>();
-        if (o == null || p == null || s == null) {
-            return substitutions;
-        }
-        if (!o.isLiteral()) {
-            return substitutions;
-        }
-        Map<Integer, Set<Integer>> ps_hashmap =  OPS.get(Integer.parseInt(o.label()))!=null?
-                OPS.get(Integer.parseInt(o.label()))
-                : new HashMap<>();
-        if (OPS.isEmpty()) {
-            return substitutions;
-        }
-        if (p.isLiteral()) {
-            Set<Integer> s_set = ps_hashmap.get(Integer.parseInt(p.label()))!=null
-                    ? ps_hashmap.get(Integer.parseInt(p.label()))
-                    : new HashSet<>();
-            if (s_set.isEmpty()) {
-                return substitutions;
-            }
-            for (Integer i : s_set) {
-                Substitution sub = new SubstitutionImpl();
-                sub.add((Variable) s, dictionnaire.getDecodageAsTerm(i));
-                substitutions.add(sub);
-            }
-        }else{
-            for (Integer ip: ps_hashmap.keySet()) {
-                Set<Integer> s_set = ps_hashmap.get(ip);
-                for (Integer is : s_set) {
-                    Substitution sub = new SubstitutionImpl();
-                    sub.add((Variable) p, dictionnaire.getDecodageAsTerm(ip));
-                    sub.add((Variable) s, dictionnaire.getDecodageAsTerm(is));
-                    substitutions.add(sub);
-                }
-            }
-        }
-        return substitutions;
-    }
-
-    private ArrayList<Substitution> matchPSO(Term s, Term p, Term o){
-        ArrayList<Substitution> substitutions = new ArrayList<>();
-        if (p == null || s == null || o == null) {
-            return substitutions;
-        }
-        if (!p.isLiteral()) {
-            return substitutions;
-        }
-        Map<Integer, Set<Integer>> so_hashmap =
-                PSO.get(Integer.parseInt(p.label()))!=null
-                        ? PSO.get(Integer.parseInt(p.label()))
-                        : new HashMap<>();
-        if (PSO.isEmpty()) {
-            return substitutions;
-        }
-        if (s.isLiteral()) {
-            Set<Integer> o_set = so_hashmap.get(Integer.parseInt(s.label()))!=null
-                    ? so_hashmap.get(Integer.parseInt(s.label()))
-                    : new HashSet<>();
-            if (o_set.isEmpty()) {
-                return substitutions;
-            }
-            for (Integer i : o_set) {
-                Substitution sub = new SubstitutionImpl();
-                sub.add((Variable) o, dictionnaire.getDecodageAsTerm(i));
-                substitutions.add(sub);
-            }
-        }else{
-            for (Integer is: so_hashmap.keySet()) {
-                Set<Integer> o_set = so_hashmap.get(is);
-                for (Integer io : o_set) {
-                    Substitution sub = new SubstitutionImpl();
-                    sub.add((Variable) s, dictionnaire.getDecodageAsTerm(is));
-                    sub.add((Variable) o, dictionnaire.getDecodageAsTerm(io));
-                    substitutions.add(sub);
-                }
-            }
-        }
         return substitutions;
     }
 
