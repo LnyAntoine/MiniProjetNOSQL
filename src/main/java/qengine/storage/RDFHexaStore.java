@@ -63,16 +63,15 @@ public class RDFHexaStore implements RDFStorage {
 
         if (!map.containsKey(fst)) {
             HashMap<Integer,ThrdValue> fstValueHashMap = new HashMap<>();
-
-            fstValueHashMap.put(-1,new ThrdValue(0));
+            fstValueHashMap.put(-1,new ThrdValue(0L));
             map.put(fst,new SndValue(fstValueHashMap));
-            map.put(-1,new SndValue(0));
+            map.put(-1,new SndValue(0L));
 
         }
         if (!map.get(fst).map.containsKey(snd)){
             HashSet <Integer> set = new HashSet<>();
             map.get(fst).map.put(snd,new ThrdValue(set));
-            map.get(fst).map.put(-1,new ThrdValue(0)); //Nombre de snd pour ce fst
+            map.get(fst).map.put(-1,new ThrdValue(0L)); //Nombre de snd pour ce fst
 
         }
 
