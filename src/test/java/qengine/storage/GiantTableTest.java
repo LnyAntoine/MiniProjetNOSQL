@@ -119,7 +119,6 @@ public class GiantTableTest {
         assertTrue(store.size() == 2, "Taille devrait être à égale à 2");
     }
 
-
     @Test
     public void testMatchAtom() {
         RDFStorage store = new GiantTableStore();
@@ -200,7 +199,6 @@ public class GiantTableTest {
             );
         }
     }
-
 
     @Test
     public void testMatchNonExistentTriple() {
