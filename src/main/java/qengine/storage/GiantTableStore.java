@@ -10,23 +10,24 @@ import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import qengine.model.RDFTriple;
 import qengine.model.StarQuery;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class GiantTableStore implements RDFStorage{
-    private List<RDFTriple> storage;
+    private HashSet<RDFTriple> storage;
     private Dictionnaire dictionnaire;
 
     public GiantTableStore() {
         dictionnaire = new Dictionnaire();
-        storage = new ArrayList<>();
+        storage = new HashSet<>();
     }
 
     @Override
     public boolean add(RDFTriple triple) {
-        System.out.println("Adding triple: " + triple);
+        if (triple.getTerm(0).isVariable() ||
+                triple.getTerm(1).isVariable() ||
+                triple.getTerm(2).isVariable()) {
+            return false;
+        }
         triple = dictionnaire.encode(triple);
         if (triple==null) {
             System.out.println("Failed to encode triple: " + triple);
@@ -37,11 +38,7 @@ public class GiantTableStore implements RDFStorage{
                 triple.getTerm(2)==null) {
             return false;
         }
-        if (triple.getTerm(0).isVariable() ||
-                triple.getTerm(1).isVariable() ||
-                triple.getTerm(2).isVariable()) {
-            return false;
-        }
+
         if (storage.contains(triple)) {
             System.out.println(triple+" already exists in storage.");
             return true;
@@ -102,7 +99,7 @@ public class GiantTableStore implements RDFStorage{
 
     @Override
     public Collection<RDFTriple> getAtoms() {
-        ArrayList<RDFTriple> atoms = new ArrayList<>();
+        HashSet<RDFTriple> atoms = new HashSet<>();
         for (RDFTriple triple : storage) {
             atoms.add(dictionnaire.decode(triple));
         }
