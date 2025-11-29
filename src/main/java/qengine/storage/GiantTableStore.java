@@ -26,12 +26,25 @@ public class GiantTableStore implements RDFStorage{
 
     @Override
     public boolean add(RDFTriple triple) {
+        System.out.println("Adding triple: " + triple);
         triple = dictionnaire.encode(triple);
         if (triple==null) {
+            System.out.println("Failed to encode triple: " + triple);
+            return false;
+        }
+        if (triple.getTerm(0)==null ||
+                triple.getTerm(1)==null ||
+                triple.getTerm(2)==null) {
+            return false;
+        }
+        if (triple.getTerm(0).isVariable() ||
+                triple.getTerm(1).isVariable() ||
+                triple.getTerm(2).isVariable()) {
             return false;
         }
         if (storage.contains(triple)) {
-            return false;
+            System.out.println(triple+" already exists in storage.");
+            return true;
         }
         storage.add(triple);
         return true;
@@ -73,9 +86,6 @@ public class GiantTableStore implements RDFStorage{
         return s;
     }
 
-
-
-
     @Override
     public long howMany(RDFTriple a) {
         return 0;
@@ -92,6 +102,10 @@ public class GiantTableStore implements RDFStorage{
 
     @Override
     public Collection<RDFTriple> getAtoms() {
-        return List.of();
+        ArrayList<RDFTriple> atoms = new ArrayList<>();
+        for (RDFTriple triple : storage) {
+            atoms.add(dictionnaire.decode(triple));
+        }
+        return atoms;
     }
 }

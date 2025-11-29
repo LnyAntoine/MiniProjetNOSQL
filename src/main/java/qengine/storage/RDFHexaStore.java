@@ -168,44 +168,11 @@ public class RDFHexaStore implements RDFStorage {
         addGeneric(OSP, o, s, p, "OSP");
         addGeneric(PSO, p, s, o, "PSO");
 
-        /*
-        addSPO(s, p, o);
-        addPOS(s, p, o);
-        addSOP(s, p, o);
-        addOPS(s, p, o);
-        addOSP(s, p, o);
-        addPSO(s, p, o);
-
-        addToSimpleStatistic(statisticS,s);
-        addToSimpleStatistic(statisticP,p);
-        addToSimpleStatistic(statisticO,o);
-
-        addToDoubleStatistic(statisticSP,s,p);
-        addToDoubleStatistic(statisticSO,s,o);
-        addToDoubleStatistic(statisticOP,o,p);
-        addToDoubleStatistic(statisticOS,o,s);
-        addToDoubleStatistic(statisticPO,p,o);
-        addToDoubleStatistic(statisticPS,p,s);
-
-         */
         return true;
-    }
-    public int sizeStore(Map<Integer, SndValue> map) {
-        int size = 0;
-        for (Integer key : map.keySet()) {
-            if (key==-1) continue;
-            for (Integer sndKey : map.get(key).map.keySet()){
-                if (sndKey==-1) continue;
-                size += map.get(key).map.get(sndKey).set.size();
-            }
-        }
-        return size;
     }
 
     @Override
     public long size() {
-/*        if (checkSynchronization()) return SPO.size();
-        else return -1;*/
         if (checkSynchronization()) return size_SOP;
         else return -1;
     }
@@ -268,7 +235,6 @@ public class RDFHexaStore implements RDFStorage {
     @Override
     public Iterator<Substitution> match(StarQuery q) {
         return RDFStorage.super.match(q);
-
     }
 
     @Override
@@ -277,9 +243,7 @@ public class RDFHexaStore implements RDFStorage {
         Term p = triple.getTerm(1);
         Term o = triple.getTerm(2);
         if (s.isVariable() && p.isVariable() && o.isVariable()) {
-            //TODO return dict size
-
-            return -1;
+            return size();
         }
         Integer sEncode = dictionnaire.getEncodage(s);
         Integer pEncode = dictionnaire.getEncodage(p);
@@ -344,9 +308,17 @@ public class RDFHexaStore implements RDFStorage {
     public Collection<RDFTriple> getAtoms() {
         ArrayList<RDFTriple> atoms = new ArrayList<>();
         for (Integer is : SPO.keySet()) {
+            if (is.equals(-1)) {
+                continue;
+            }
             for (Integer ip : SPO.get(is).map.keySet()) {
+                if (ip.equals(-1)) {
+                    continue;
+                }
                 for (Integer io : SPO.get(is).map.get(ip).set) {
-                    //SameObjectTermFactory.instance().createOrGetLiteral();
+                    if (io.equals(-1)) {
+                        continue;
+                    }
                     RDFTriple triple = new RDFTriple(
                             dictionnaire.getDecodageAsTerm(is),
                             dictionnaire.getDecodageAsTerm(ip),

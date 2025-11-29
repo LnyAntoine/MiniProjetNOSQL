@@ -44,7 +44,6 @@ public class Dictionnaire {
                     tableEncodage.put(term.label(),tableEncodage.size());
                     tableDecodage.put(tableEncodage.size()-1, term.label());
                 } else {
-                    //should not happen
                     return null;
                 }
             }
@@ -58,11 +57,11 @@ public class Dictionnaire {
 
     protected RDFTriple decode(RDFTriple triple) {
         Literal<String> s =
-                (Literal<String>) createLiteralFromString(getDecodage(triple.getTerms()[0]));
+                createLiteralFromString(getDecodage(triple.getTerms()[0]));
         Literal<String> p =
-                (Literal<String>) createLiteralFromString(getDecodage(triple.getTerms()[1]));
+                createLiteralFromString(getDecodage(triple.getTerms()[1]));
         Literal<String> o =
-                (Literal<String>) createLiteralFromString(getDecodage(triple.getTerms()[2]));
+                createLiteralFromString(getDecodage(triple.getTerms()[2]));
 
         return new RDFTriple(s, p, o);
     }

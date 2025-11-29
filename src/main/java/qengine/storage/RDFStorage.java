@@ -59,12 +59,7 @@ public interface RDFStorage {
 
     default List<RDFTriple> sortAtoms(List<RDFTriple> atomsList){
         List<RDFTriple> sortedAtoms = atomsList.stream().sorted(
-                new Comparator<RDFTriple>() {
-                    @Override
-                    public int compare(RDFTriple o1, RDFTriple o2) {
-                        return Long.compare(howMany(o1), howMany(o2));
-                    }
-                }
+                (o1, o2) -> Long.compare(howMany(o1), howMany(o2))
         ).toList();
         return sortedAtoms;
     }
