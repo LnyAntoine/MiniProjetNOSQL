@@ -5,6 +5,7 @@ import fr.boreal.model.logicalElements.api.Substitution;
 import fr.boreal.model.logicalElements.factory.impl.SameObjectTermFactory;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class utils {
     }
 
     public static Iterator<Substitution> intersectTwoIterators(Iterator<Substitution> it1, Iterator<Substitution> it2) {
-        ArrayList<Substitution> list1 = new ArrayList<>();
+        HashSet<Substitution> list1 = new HashSet<>();
         ArrayList<Substitution> result = new ArrayList<>();
         if (!it1.hasNext() || !it2.hasNext()) {
             return result.iterator();
