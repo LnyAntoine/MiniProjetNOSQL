@@ -170,10 +170,10 @@ public class GiantTableTest {
     @Test
     public void testMatchStarQueryIntegraal() throws IOException {
         System.out.println("=== Parsing RDF Data ===");
-        List<RDFTriple> rdfAtoms = parseRDFData(SAMPLE_DATA_FILE);
+        List<RDFTriple> rdfAtoms = parseRDFData(SAMPLE_BIG_DATA_FILE);
 
         System.out.println("\n=== Parsing Sample Queries ===");
-        List<StarQuery> starQueries = parseSparQLQueries(SAMPLE_QUERY_FILE);
+        List<StarQuery> starQueries = parseSparQLQueries(SAMPLE_BIG_QUERY_FILE);
 
         RDFStorage store = new GiantTableStore();
         FactBase factBase = new SimpleInMemoryGraphStore();
