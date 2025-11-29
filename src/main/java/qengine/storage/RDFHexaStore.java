@@ -23,7 +23,12 @@ public class RDFHexaStore implements RDFStorage {
     private final Map<Integer,SndValue> PSO;
     private final Map<Integer,SndValue> OSP;
     private final Map<Integer,SndValue> OPS;
-
+    private long size_SPO = 0;
+    private long size_POS = 0;
+    private long size_SOP = 0;
+    private long size_PSO = 0;
+    private long size_OSP = 0;
+    private long size_OPS = 0;
 
 
     private final Dictionnaire dictionnaire;
@@ -43,26 +48,51 @@ public class RDFHexaStore implements RDFStorage {
 
     }
 
-    public void addGeneric(Map<Integer,SndValue> map, Integer fst, Integer snd, Integer thrd) {
 
+    public boolean addGeneric(Map<Integer, SndValue> map, Integer fst, Integer snd, Integer thrd, String mapName) {
         if (!map.containsKey(fst)) {
-            HashMap<Integer,ThrdValue> fstValueHashMap = new HashMap<>();
-            fstValueHashMap.put(-1,new ThrdValue(0L));
-            map.put(fst,new SndValue(fstValueHashMap));
-            map.put(-1,new SndValue(0L));
-
+            HashMap<Integer, ThrdValue> fstValueHashMap = new HashMap<>();
+            fstValueHashMap.put(-1, new ThrdValue(0L));
+            map.put(fst, new SndValue(fstValueHashMap));
+            map.put(-1, new SndValue(0L));
         }
-        if (!map.get(fst).map.containsKey(snd)){
-            HashSet <Integer> set = new HashSet<>();
-            map.get(fst).map.put(snd,new ThrdValue(set));
-            map.get(fst).map.put(-1,new ThrdValue(0L)); //Nombre de snd pour ce fst
-
+        if (!map.get(fst).map.containsKey(snd)) {
+            HashSet<Integer> set = new HashSet<>();
+            map.get(fst).map.put(snd, new ThrdValue(set));
+            map.get(fst).map.put(-1, new ThrdValue(0L)); // Nombre de snd pour ce fst
         }
 
         Set<Integer> set = map.get(fst).map.get(snd).set;
-        set.add(thrd);
-        map.get(fst).map.put(snd,new ThrdValue(set));
-        map.get(fst).map.put(-1,new ThrdValue(map.get(fst).map.get(-1).stat + 1)); //Incrémenter le nombre de snd pour ce fst
+        if (set.add(thrd)) { // Increment size only if the element is new
+            incrementSize(mapName);
+        }
+        map.get(fst).map.put(snd, new ThrdValue(set));
+        map.get(fst).map.put(-1, new ThrdValue(map.get(fst).map.get(-1).stat + 1)); // Incrémenter le nombre de snd pour ce fst
+        return true;
+    }
+    private void incrementSize(String mapName) {
+        switch (mapName) {
+            case "SPO":
+                size_SPO++;
+                break;
+            case "POS":
+                size_POS++;
+                break;
+            case "SOP":
+                size_SOP++;
+                break;
+            case "PSO":
+                size_PSO++;
+                break;
+            case "OSP":
+                size_OSP++;
+                break;
+            case "OPS":
+                size_OPS++;
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid map name: " + mapName);
+        }
     }
 
     public ArrayList<Substitution> matchGeneric(Map<Integer,SndValue> map, Term fst, Term snd, Term thrd) {
@@ -131,12 +161,12 @@ public class RDFHexaStore implements RDFStorage {
         Integer o = Integer.parseInt(triple.getTerms()[2].label());
 
 
-        addGeneric(SPO,s,p,o);
-        addGeneric(POS,p,o,s);
-        addGeneric(SOP,s,o,p);
-        addGeneric(OPS,o,p,s);
-        addGeneric(OSP,o,s,p);
-        addGeneric(PSO,p,s,o);
+        addGeneric(SPO, s, p, o, "SPO");
+        addGeneric(POS, p, o, s, "POS");
+        addGeneric(SOP, s, o, p, "SOP");
+        addGeneric(OPS, o, p, s, "OPS");
+        addGeneric(OSP, o, s, p, "OSP");
+        addGeneric(PSO, p, s, o, "PSO");
 
         /*
         addSPO(s, p, o);
@@ -176,7 +206,7 @@ public class RDFHexaStore implements RDFStorage {
     public long size() {
 /*        if (checkSynchronization()) return SPO.size();
         else return -1;*/
-        if (checkSynchronization()) return sizeStore(SPO);
+        if (checkSynchronization()) return size_SOP;
         else return -1;
     }
 
@@ -248,6 +278,7 @@ public class RDFHexaStore implements RDFStorage {
         Term o = triple.getTerm(2);
         if (s.isVariable() && p.isVariable() && o.isVariable()) {
             //TODO return dict size
+
             return -1;
         }
         Integer sEncode = dictionnaire.getEncodage(s);
@@ -351,11 +382,11 @@ public class RDFHexaStore implements RDFStorage {
     }
 
     private boolean checkSynchronization() {
-        return sizeStore(SPO)== sizeStore(POS) &&
-                sizeStore(POS) == sizeStore(SOP) &&
-                sizeStore(SOP) == sizeStore(PSO) &&
-                sizeStore(PSO) == sizeStore(OPS) &&
-                sizeStore(OPS) == sizeStore(OSP);
+        return size_SPO == size_POS &&
+                size_POS == size_PSO &&
+                size_PSO == size_SOP &&
+                size_SOP == size_OPS &&
+                size_OPS == size_OSP;
     }
 
 
