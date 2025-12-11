@@ -56,7 +56,7 @@ public class RDFHexaStoreTest {
 
         // Vérifier que tous les atomes sont présents
         Collection<RDFTriple> atoms = store.getAtoms();
-
+        System.out.println(atoms);
         assertTrue(atoms.contains(rdfAtom1), "La base devrait contenir le premier RDFAtom ajouté.");
         assertTrue(atoms.contains(rdfAtom2), "La base devrait contenir le second RDFAtom ajouté.");
 
@@ -87,6 +87,7 @@ public class RDFHexaStoreTest {
         System.out.println(atoms);
         System.out.println(rdfAtom1);
         System.out.println(rdfAtom2);
+        System.out.println(store.size());
 
         assertTrue(atoms.contains(rdfAtom1), "La base devrait contenir le premier RDFAtom ajouté.");
         assertTrue(atoms.contains(rdfAtom2), "La base devrait contenir le second RDFAtom ajouté.");
@@ -223,12 +224,15 @@ public class RDFHexaStoreTest {
         FactBase factBase = new SimpleInMemoryGraphStore();
 
         //stockage dans Hexastore
+        System.out.println("Parsing 3 " + rdfAtoms.size());
+
         store.addAll(rdfAtoms);
+        System.out.println("\n=== Parsing 3 Queries ===");
+
         //stockage dasn Integraal
         for (RDFTriple triple : rdfAtoms) {
             factBase.add(triple);  // Stocker chaque RDFAtom dans le store
         }
-
         for (StarQuery starQuery : starQueries) {
             Collection<Substitution> integraal_result = new ArrayList<>();
             executeStarQuery(starQuery, factBase).forEachRemaining(integraal_result::add);

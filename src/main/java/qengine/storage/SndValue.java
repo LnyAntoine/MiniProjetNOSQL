@@ -1,8 +1,9 @@
 package qengine.storage;
 
+import java.io.Serializable;
 import java.util.Map;
 
-public class SndValue {
+public class SndValue implements Serializable {
     long stat;
     Map<Integer,ThrdValue> map;
     public SndValue(long stat) {

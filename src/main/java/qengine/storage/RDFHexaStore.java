@@ -2,8 +2,10 @@ package qengine.storage;
 
 import fr.boreal.model.logicalElements.api.*;
 import fr.boreal.model.logicalElements.impl.SubstitutionImpl;
+import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
+import org.mapdb.Serializer;
 import qengine.model.RDFTriple;
 import qengine.model.StarQuery;
 
@@ -17,12 +19,12 @@ import java.util.*;
  * (Prédicat, Sujet, Objet), (Prédicat, Objet, Sujet), (Objet, Sujet, Prédicat) et (Objet, Prédicat, Sujet).
  */
 public class RDFHexaStore implements RDFStorage {
-    private final Map<Integer,SndValue> SPO;
-    private final Map<Integer,SndValue> POS;
-    private final Map<Integer,SndValue> SOP;
-    private final Map<Integer,SndValue> PSO;
-    private final Map<Integer,SndValue> OSP;
-    private final Map<Integer,SndValue> OPS;
+    private final BTreeMap<Integer,SndValue> SPO;
+    private final BTreeMap<Integer,SndValue> POS;
+    private final BTreeMap<Integer,SndValue> SOP;
+    private final BTreeMap<Integer,SndValue> PSO;
+    private final BTreeMap<Integer,SndValue> OSP;
+    private final BTreeMap<Integer,SndValue> OPS;
     private long size_SPO = 0;
     private long size_POS = 0;
     private long size_SOP = 0;
@@ -32,42 +34,55 @@ public class RDFHexaStore implements RDFStorage {
 
 
     private final Dictionnaire dictionnaire;
-    //private DB db;
+    private final DB db;
 
     public RDFHexaStore() {
+        this(DBMaker.memoryDB().make());
+    }
 
-        dictionnaire = new Dictionnaire();
-        //db = DBMaker.memoryDB().make();
+    public RDFHexaStore(DB db) {
+        this.db = db;
+        this.dictionnaire = new Dictionnaire(db);
 
-        SPO = new HashMap<>();
-        SOP = new HashMap<>();
-        PSO = new HashMap<>();
-        POS = new HashMap<>();
-        OSP = new HashMap<>();
-        OPS = new HashMap<>();
+        SPO = db.treeMap("SPO", Serializer.INTEGER, Serializer.JAVA).createOrOpen();
+        SOP = db.treeMap("SOP", Serializer.INTEGER, Serializer.JAVA).createOrOpen();
+        PSO = db.treeMap("PSO", Serializer.INTEGER, Serializer.JAVA).createOrOpen();
+        POS = db.treeMap("POS", Serializer.INTEGER, Serializer.JAVA).createOrOpen();
+        OSP = db.treeMap("OSP", Serializer.INTEGER, Serializer.JAVA).createOrOpen();
+        OPS = db.treeMap("OPS", Serializer.INTEGER, Serializer.JAVA).createOrOpen();
+    }
 
+    public void close() {
+        if (!db.isClosed()) {
+            db.close();
+        }
     }
 
 
     public boolean addGeneric(Map<Integer, SndValue> map, Integer fst, Integer snd, Integer thrd, String mapName) {
-        if (!map.containsKey(fst)) {
+        SndValue sndValue = map.get(fst);
+        if (sndValue == null) {
             HashMap<Integer, ThrdValue> fstValueHashMap = new HashMap<>();
             fstValueHashMap.put(-1, new ThrdValue(0L));
-            map.put(fst, new SndValue(fstValueHashMap));
-            map.put(-1, new SndValue(0L));
-        }
-        if (!map.get(fst).map.containsKey(snd)) {
-            HashSet<Integer> set = new HashSet<>();
-            map.get(fst).map.put(snd, new ThrdValue(set));
-            map.get(fst).map.put(-1, new ThrdValue(0L)); // Nombre de snd pour ce fst
+            sndValue = new SndValue(fstValueHashMap);
+            map.put(fst, sndValue);
         }
 
-        Set<Integer> set = map.get(fst).map.get(snd).set;
-        if (set.add(thrd)) { // Increment size only if the element is new
-            incrementSize(mapName);
+        ThrdValue thrdValue = sndValue.map.get(snd);
+        if (thrdValue == null) {
+            thrdValue = new ThrdValue(new HashSet<>());
+            sndValue.map.put(snd, thrdValue);
         }
-        map.get(fst).map.put(snd, new ThrdValue(set));
-        map.get(fst).map.put(-1, new ThrdValue(map.get(fst).map.get(-1).stat + 1)); // Incrémenter le nombre de snd pour ce fst
+
+        if (thrdValue.set.add(thrd)) { // Increment size only if the element is new
+            incrementSize(mapName);
+            ThrdValue statThrdValue = sndValue.map.get(-1);
+            if (statThrdValue != null) {
+                statThrdValue.stat++;
+            }
+            // IMPORTANT: Re-mettre l'objet dans la map pour que MapDB persiste les changements
+            map.put(fst, sndValue);
+        }
         return true;
     }
     private void incrementSize(String mapName) {
@@ -125,6 +140,7 @@ public class RDFHexaStore implements RDFStorage {
             }
         } else {
             for (Integer is : snd_thrd_map.keySet()) {
+                if (is.equals(-1)) continue;
                 Set<Integer> thrd_set = snd_thrd_map.get(is).set;
                 for (Integer io : thrd_set) {
                     Substitution sub = new SubstitutionImpl();
@@ -179,14 +195,7 @@ public class RDFHexaStore implements RDFStorage {
 
     @Override
     public Iterator<Substitution> match(RDFTriple triple) {
-        System.out.println("Matching triple: " + triple);
-        System.out.println("SPO :");
-        System.out.println(SPO.keySet());
-        for (Integer key : SPO.keySet()) {
-            System.out.println("    Key: " + key + ", Value: " + SPO.get(key));
-        }
         ArrayList<Substitution> substitutions = new ArrayList<>();
-        System.out.println();
         if (triple==null) {
             return substitutions.iterator();
         }
@@ -206,14 +215,14 @@ public class RDFHexaStore implements RDFStorage {
             //Va tout demander ?
             return matchAll(s,p,o).iterator();
         }
-        else if (!s.isVariable() && !p.isVariable() && !o.isVariable()) {
+        else if (s.isLiteral() && p.isLiteral() && o.isLiteral()) {
             //Pas une requete ?
             return substitutions.iterator();
         }
 
-        if (!s.isVariable()) {
+        if (s.isLiteral()) {
             //Match dans S..
-            if (!o.isVariable()) { //S littéral, O littéral, P doit etre variable
+            if (o.isLiteral()) { //S littéral, O littéral, P doit etre variable
                 //Match SOP
                 substitutions = matchGeneric(SOP,s,o,p);
             }
@@ -221,7 +230,7 @@ public class RDFHexaStore implements RDFStorage {
                 substitutions = matchGeneric(SPO,s,p,o);
             }
         } else {
-            if (!o.isVariable()) {
+            if (o.isLiteral()) {
                 // S est variable, O est littéral, P peut etre littéral donc OPS
                 substitutions = matchGeneric(OPS,o, p, s);
             }
@@ -263,7 +272,7 @@ public class RDFHexaStore implements RDFStorage {
                 } else {
                     howmany = SPO.get(sEncode)!=null
                             ? SPO.get(sEncode).map.get(pEncode)!=null
-                                ? (long) SPO.get(sEncode).map.get(-1).stat
+                                ? (long) SPO.get(sEncode).map.get(pEncode).set.size()
                                 : 0L
                             :0L;
 
@@ -273,13 +282,13 @@ public class RDFHexaStore implements RDFStorage {
                 if (!oEncode.equals(-1)) {
                     howmany = SOP.get(sEncode)!=null
                             ? SOP.get(sEncode).map.get(oEncode)!=null
-                                ? SOP.get(sEncode).map.get(oEncode).stat
+                                ? (long) SOP.get(sEncode).map.get(oEncode).set.size()
                                 : 0L
                             :0L;
                 }
                 else {
                     howmany = SOP.get(sEncode)!=null
-                            ? SOP.get(sEncode).map.get(-1).stat
+                            ? SOP.get(sEncode).stat
                             : 0L;
                 }
 
@@ -289,14 +298,14 @@ public class RDFHexaStore implements RDFStorage {
                 if (!oEncode.equals(-1)) {
                     howmany = POS.get(pEncode)!=null
                             ? POS.get(pEncode).map.get(oEncode)!=null
-                                ? POS.get(pEncode).map.get(oEncode).stat
+                                ? (long) POS.get(pEncode).map.get(oEncode).set.size()
                                 : 0L
                             :0L;
                 }
             } else {
                 if (!oEncode.equals(-1)) {
                     howmany = OPS.get(oEncode)!=null
-                            ? OPS.get(oEncode).map.get(-1).stat
+                            ? OPS.get(oEncode).stat
                             : 0L;
                 }
             }
@@ -337,8 +346,10 @@ public class RDFHexaStore implements RDFStorage {
             return substitutions;
         }
         for (Integer is : SPO.keySet()) {
+            if (is.equals(-1)) continue;
             Map<Integer, ThrdValue> po_hashmap = SPO.get(is).map;
             for (Integer ip : po_hashmap.keySet()) {
+                if (ip.equals(-1)) continue;
                 Set<Integer> o_set = po_hashmap.get(ip).set;
                 for (Integer io : o_set) {
                     Substitution sub = new SubstitutionImpl();

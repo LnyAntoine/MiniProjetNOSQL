@@ -4,19 +4,46 @@ import fr.boreal.model.logicalElements.api.Literal;
 import fr.boreal.model.logicalElements.api.Term;
 import fr.boreal.model.logicalElements.impl.LiteralImpl;
 import qengine.model.RDFTriple;
+import org.mapdb.BTreeMap;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+import org.mapdb.Serializer;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import static qengine.utils.createLiteralFromObject;
 import static qengine.utils.createLiteralFromString;
 
 public class Dictionnaire {
-    protected HashMap<String, Integer> tableEncodage;
-    protected HashMap<Integer, String> tableDecodage;
+    protected final DB db;
+    protected final BTreeMap<String, Integer> tableEncodage;
+    protected final BTreeMap<Integer, String> tableDecodage;
+    private boolean closeDb;
 
     public Dictionnaire() {
-        tableEncodage = new HashMap<>();
-        tableDecodage = new HashMap<>();
+        this(DBMaker.memoryDB().make(), true);
+    }
+
+    public Dictionnaire(DB db) {
+        this(db, false);
+    }
+
+    private Dictionnaire(DB db, boolean closeDb) {
+        this.db = db;
+        this.closeDb = closeDb;
+        this.tableEncodage = db
+                .treeMap("tableEncodage", Serializer.STRING, Serializer.INTEGER)
+                .createOrOpen();
+        this.tableDecodage = db
+                .treeMap("tableDecodage", Serializer.INTEGER, Serializer.STRING)
+                .createOrOpen();
+    }
+
+    public void close() {
+        if (closeDb && !db.isClosed()) {
+            db.close();
+        }
     }
 
     protected RDFTriple encodeTripleQuery(RDFTriple triple) {
@@ -41,8 +68,9 @@ public class Dictionnaire {
             }
             if (!tableEncodage.containsKey(term.label())){
                 if (!tableDecodage.containsKey(tableEncodage.size())){
-                    tableEncodage.put(term.label(),tableEncodage.size());
-                    tableDecodage.put(tableEncodage.size()-1, term.label());
+                    int size = tableEncodage.size();
+                    tableEncodage.put(term.label(),size);
+                    tableDecodage.put(size, term.label());
                 } else {
                     return null;
                 }

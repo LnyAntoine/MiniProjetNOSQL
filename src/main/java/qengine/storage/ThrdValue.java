@@ -1,8 +1,9 @@
 package qengine.storage;
 
+import java.io.Serializable;
 import java.util.Set;
 
-public class ThrdValue {
+public class ThrdValue implements Serializable {
     long stat;
     Set<Integer> set;
     public ThrdValue(long stat) {
