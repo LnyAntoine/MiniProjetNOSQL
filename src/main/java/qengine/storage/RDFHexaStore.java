@@ -37,7 +37,9 @@ public class RDFHexaStore implements RDFStorage {
     private final DB db;
 
     public RDFHexaStore() {
-        this(DBMaker.memoryDB().make());
+        this(DBMaker.memoryDB()
+                .transactionEnable() // Enable transactions for better performance
+                .make());
     }
 
     public RDFHexaStore(DB db) {
@@ -61,17 +63,20 @@ public class RDFHexaStore implements RDFStorage {
 
     public boolean addGeneric(Map<Integer, SndValue> map, Integer fst, Integer snd, Integer thrd, String mapName) {
         SndValue sndValue = map.get(fst);
+        boolean needsUpdate = false;
+
         if (sndValue == null) {
             HashMap<Integer, ThrdValue> fstValueHashMap = new HashMap<>();
             fstValueHashMap.put(-1, new ThrdValue(0L));
             sndValue = new SndValue(fstValueHashMap);
-            map.put(fst, sndValue);
+            needsUpdate = true;
         }
 
         ThrdValue thrdValue = sndValue.map.get(snd);
         if (thrdValue == null) {
             thrdValue = new ThrdValue(new HashSet<>());
             sndValue.map.put(snd, thrdValue);
+            needsUpdate = true;
         }
 
         if (thrdValue.set.add(thrd)) { // Increment size only if the element is new
@@ -80,10 +85,15 @@ public class RDFHexaStore implements RDFStorage {
             if (statThrdValue != null) {
                 statThrdValue.stat++;
             }
-            // IMPORTANT: Re-mettre l'objet dans la map pour que MapDB persiste les changements
+            needsUpdate = true;
+        }
+
+        // IMPORTANT: Ne mettre à jour que si nécessaire
+        if (needsUpdate) {
             map.put(fst, sndValue);
         }
-        return true;
+
+        return needsUpdate;
     }
     private void incrementSize(String mapName) {
         switch (mapName) {
@@ -185,6 +195,49 @@ public class RDFHexaStore implements RDFStorage {
         addGeneric(PSO, p, s, o, "PSO");
 
         return true;
+    }
+
+    /**
+     * Version optimisée de addAll qui utilise les transactions MapDB pour améliorer les performances
+     */
+    @Override
+    public boolean addAll(Collection<RDFTriple> atoms) {
+        if (atoms.isEmpty()) {
+            return false;
+        }
+
+        boolean result = false;
+
+        // Utiliser une transaction si la DB le supporte
+        try {
+            for (RDFTriple triple : atoms) {
+                boolean added = add(triple);
+                result = result || added;
+            }
+
+            // Commit la transaction si elle existe
+            if (!db.isClosed()) {
+                db.commit();
+            }
+        } catch (Exception e) {
+            // En cas d'erreur, rollback si possible
+            if (!db.isClosed()) {
+                try {
+                    db.rollback();
+                } catch (Exception ignored) {}
+            }
+            throw e;
+        }
+
+        return result;
+    }
+
+    /**
+     * Version optimisée de addAll qui utilise les transactions MapDB pour améliorer les performances
+     */
+    @Override
+    public boolean addAll(java.util.stream.Stream<RDFTriple> atoms) {
+        return addAll(atoms.collect(java.util.stream.Collectors.toList()));
     }
 
     @Override
