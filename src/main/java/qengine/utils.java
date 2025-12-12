@@ -4,10 +4,14 @@ import fr.boreal.model.logicalElements.api.Literal;
 import fr.boreal.model.logicalElements.api.Substitution;
 import fr.boreal.model.logicalElements.factory.impl.SameObjectTermFactory;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class utils {
     public static Literal<Integer> createLiteralFromInteger(Integer value) {
@@ -44,5 +48,18 @@ public class utils {
             }
         }
         return result.iterator();
+    }
+
+    // Variante moderne avec java.nio.file (Java 8+)
+    public static List<String> listFileNamesNio(String dirPath) throws IOException {
+        Path dir = Paths.get(dirPath);
+        if (!Files.isDirectory(dir)) return Collections.emptyList();
+        try (Stream<Path> stream = Files.list(dir)) {
+            return stream
+                    .filter(Files::isRegularFile)
+                    .map(Path::getFileName)
+                    .map(Path::toString)
+                    .collect(Collectors.toList());
+        }
     }
 }
