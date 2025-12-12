@@ -179,14 +179,7 @@ public class RDFHexaStore implements RDFStorage {
 
     @Override
     public Iterator<Substitution> match(RDFTriple triple) {
-        System.out.println("Matching triple: " + triple);
-        System.out.println("SPO :");
-        System.out.println(SPO.keySet());
-        for (Integer key : SPO.keySet()) {
-            System.out.println("    Key: " + key + ", Value: " + SPO.get(key));
-        }
         ArrayList<Substitution> substitutions = new ArrayList<>();
-        System.out.println();
         if (triple==null) {
             return substitutions.iterator();
         }

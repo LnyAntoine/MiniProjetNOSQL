@@ -65,6 +65,31 @@ public interface RDFStorage {
         return sortedAtoms;
     }
 
+    default Iterator<Substitution> oldMatch(StarQuery q){
+        try {
+            q.getCentralVariable();
+
+            List<RDFTriple> rdfAtoms = q.getRdfAtoms();
+            RDFTriple triple = rdfAtoms.getFirst();
+            Iterator<Substitution> it = match(triple);
+            for (int i = 1; i < rdfAtoms.size() && it.hasNext(); i++) {
+                RDFTriple t = rdfAtoms.get(i);
+                Iterator<Substitution> it2 = match(t);
+                if (!it2.hasNext()) {
+                    it = new ArrayList<Substitution>().iterator();
+                    break;
+                }
+                it = utils.intersectTwoIterators(it, it2);
+            }
+            return it;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<Substitution>().iterator();
+        }
+    }
+
+
+
     /**
      * @param a atom
      * @return
