@@ -1,11 +1,9 @@
 package qengine.storage;
 
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Stream;
 
 import fr.boreal.model.logicalElements.api.Substitution;
-import fr.lirmm.graphik.graal.api.core.AtomComparator;
 import qengine.model.RDFTriple;
 import qengine.model.StarQuery;
 import qengine.utils;
@@ -65,7 +63,7 @@ public interface RDFStorage {
         return sortedAtoms;
     }
 
-    default Iterator<Substitution> oldMatch(StarQuery q){
+    default Iterator<Substitution> matchWithoutStatistic(StarQuery q){
         try {
             q.getCentralVariable();
 
