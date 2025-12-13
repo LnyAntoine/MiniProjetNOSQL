@@ -6,6 +6,7 @@ import qengine.model.StarQuery;
 import qengine.utils.WelfordAlgorithm;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 
 import static qengine.program.Example.parseRDFData;
@@ -25,20 +26,48 @@ public class RDFHexaStoreVsNoStatisticTest {
 
         //List<StarQuery> starQueries = parseSparQLQueries(SAMPLE_BIG_QUERY_FILE);
 
+
+
         WelfordAlgorithm globalWelfordHexa = new WelfordAlgorithm();
         WelfordAlgorithm globalWelfordHexaNoStat = new WelfordAlgorithm();
+        final int BATCH_SIZE = 5;
+        boolean altern = true;
 
-        for (RDFTriple atom : rdfAtoms) {
-            long start = System.nanoTime();
-            hexaStore.add(atom);
-            long end = System.nanoTime();
-            globalWelfordHexa.add(end - start);
+        Iterator<RDFTriple> it = rdfAtoms.iterator();
 
-            start = System.nanoTime();
-            hexaStoreNoStat.add(atom);
-            end = System.nanoTime();
-            globalWelfordHexaNoStat.add(end - start);
+        while (it.hasNext()) {
+
+            long durationHexa = 0;
+            long durationHexaNoStat = 0;
+
+            for (int i = 0; i < BATCH_SIZE && it.hasNext(); i++) {
+                RDFTriple atom = it.next();
+
+                if (altern) {
+                    long start = System.nanoTime();
+                    hexaStore.add(atom);
+                    durationHexa += System.nanoTime() - start;
+
+                    start = System.nanoTime();
+                    hexaStoreNoStat.add(atom);
+                    durationHexaNoStat += System.nanoTime() - start;
+                } else {
+                    long start = System.nanoTime();
+                    hexaStoreNoStat.add(atom);
+                    durationHexaNoStat += System.nanoTime() - start;
+
+                    start = System.nanoTime();
+                    hexaStore.add(atom);
+                    durationHexa += System.nanoTime() - start;
+                }
+            }
+            globalWelfordHexa.add((double) durationHexa / BATCH_SIZE);
+            globalWelfordHexaNoStat.add((double) durationHexaNoStat / BATCH_SIZE);
+
+            altern = !altern;
         }
+
+
         double thresholdHexa = globalWelfordHexa.getMean() + 3 * globalWelfordHexa.getStdDev();
         double thresholdHexaNoStats = globalWelfordHexaNoStat.getMean() + 3 * globalWelfordHexaNoStat.getStdDev();
 
@@ -47,24 +76,55 @@ public class RDFHexaStoreVsNoStatisticTest {
         WelfordAlgorithm WelfordHexa = new WelfordAlgorithm();
         WelfordAlgorithm WelfordHexaNoStat = new WelfordAlgorithm();
 
+       altern = true;
 
-        for (RDFTriple atom : rdfAtoms) {
-            long start = System.nanoTime();
-            hexaStore.add(atom);
-            long end = System.nanoTime();
-            long durationHexa = end - start;
-            if (durationHexa <= thresholdHexa) {
-                WelfordHexa.add(durationHexa);
+        it = rdfAtoms.iterator();
+
+        while (it.hasNext()) {
+
+            long totalHexa = 0;
+            long totalHexaNoStat = 0;
+            int count = 0;
+
+            for (int i = 0; i < BATCH_SIZE && it.hasNext(); i++) {
+                RDFTriple atom = it.next();
+                count++;
+
+                if (altern) {
+                    long start = System.nanoTime();
+                    hexaStore.add(atom);
+                    totalHexa += System.nanoTime() - start;
+
+                    start = System.nanoTime();
+                    hexaStoreNoStat.add(atom);
+                    totalHexaNoStat += System.nanoTime() - start;
+                } else {
+                    long start = System.nanoTime();
+                    hexaStoreNoStat.add(atom);
+                    totalHexaNoStat += System.nanoTime() - start;
+
+                    start = System.nanoTime();
+                    hexaStore.add(atom);
+                    totalHexa += System.nanoTime() - start;
+                }
             }
 
-            start = System.nanoTime();
-            hexaStoreNoStat.add(atom);
-            end = System.nanoTime();
-            long durationHexaNoStat = end - start;
-            if (durationHexaNoStat <= thresholdHexaNoStats) {
-                WelfordHexaNoStat.add(durationHexaNoStat);
+            // moyenne par opération pour le batch
+            long avgHexa = totalHexa / count;
+            long avgHexaNoStat = totalHexaNoStat / count;
+
+            // filtrage des outliers
+            if (avgHexa <= thresholdHexa) {
+                WelfordHexa.add(avgHexa);
             }
+
+            if (avgHexaNoStat <= thresholdHexaNoStats) {
+                WelfordHexaNoStat.add(avgHexaNoStat);
+            }
+
+            altern = !altern;
         }
+
 
         System.out.println("Start Hexastore avec et sans statistiques sur Add");
 
@@ -94,17 +154,47 @@ public class RDFHexaStoreVsNoStatisticTest {
         WelfordAlgorithm globalWelfordHexa = new WelfordAlgorithm();
         WelfordAlgorithm globalWelfordHexaNoStat = new WelfordAlgorithm();
 
-        for (StarQuery query : starQueries) {
-            long start = System.nanoTime();
-            hexaStore.match(query);
-            long end = System.nanoTime();
-            globalWelfordHexa.add(end - start);
+        final int BATCH_SIZE = 5;
+        boolean altern = true;
 
-            start = System.nanoTime();
-            hexaStoreNoStat.matchWithoutStatistic(query);
-            end = System.nanoTime();
-            globalWelfordHexaNoStat.add(end - start);
+        Iterator<StarQuery> it = starQueries.iterator();
+
+        while (it.hasNext()) {
+
+            long totalHexa = 0;
+            long totalHexaNoStat = 0;
+            int count = 0;
+
+            for (int i = 0; i < BATCH_SIZE && it.hasNext(); i++) {
+                StarQuery query = it.next();
+                count++;
+
+                if (altern) {
+                    long start = System.nanoTime();
+                    hexaStore.match(query);
+                    totalHexa += System.nanoTime() - start;
+
+                    start = System.nanoTime();
+                    hexaStoreNoStat.matchWithoutStatistic(query);
+                    totalHexaNoStat += System.nanoTime() - start;
+                } else {
+                    long start = System.nanoTime();
+                    hexaStoreNoStat.matchWithoutStatistic(query);
+                    totalHexaNoStat += System.nanoTime() - start;
+
+                    start = System.nanoTime();
+                    hexaStore.match(query);
+                    totalHexa += System.nanoTime() - start;
+                }
+            }
+
+            // moyenne par requête dans le batch
+            globalWelfordHexa.add(totalHexa / count);
+            globalWelfordHexaNoStat.add(totalHexaNoStat / count);
+
+            altern = !altern;
         }
+
 
 
         double thresholdHexa = globalWelfordHexa.getMean() + 3 * globalWelfordHexa.getStdDev();
@@ -115,22 +205,50 @@ public class RDFHexaStoreVsNoStatisticTest {
         WelfordAlgorithm WelfordHexa = new WelfordAlgorithm();
         WelfordAlgorithm WelfordHexaNoStat = new WelfordAlgorithm();
 
-        for (StarQuery query : starQueries) {
-            long start = System.nanoTime();
-            hexaStore.match(query);
-            long end = System.nanoTime();
-            long durationHexa = end - start;
-            if (durationHexa <= thresholdHexa) {
-                WelfordHexa.add(durationHexa);
+        altern = true;
+        it = starQueries.iterator();
+
+        while (it.hasNext()) {
+
+            long totalHexa = 0;
+            long totalHexaNoStat = 0;
+            int count = 0;
+
+            for (int i = 0; i < BATCH_SIZE && it.hasNext(); i++) {
+                StarQuery query = it.next();
+                count++;
+
+                if (altern) {
+                    long start = System.nanoTime();
+                    hexaStore.match(query);
+                    totalHexa += System.nanoTime() - start;
+
+                    start = System.nanoTime();
+                    hexaStoreNoStat.matchWithoutStatistic(query);
+                    totalHexaNoStat += System.nanoTime() - start;
+                } else {
+                    long start = System.nanoTime();
+                    hexaStoreNoStat.matchWithoutStatistic(query);
+                    totalHexaNoStat += System.nanoTime() - start;
+
+                    start = System.nanoTime();
+                    hexaStore.match(query);
+                    totalHexa += System.nanoTime() - start;
+                }
             }
 
-            start = System.nanoTime();
-            hexaStoreNoStat.matchWithoutStatistic(query);
-            end = System.nanoTime();
-            long durationHexaNoStat = end - start;
-            if (durationHexaNoStat <= thresholdHexaNoStats) {
-                WelfordHexaNoStat.add(durationHexaNoStat);
+            long avgHexa = totalHexa / count;
+            long avgHexaNoStat = totalHexaNoStat / count;
+
+            if (avgHexa <= thresholdHexa) {
+                WelfordHexa.add(avgHexa);
             }
+
+            if (avgHexaNoStat <= thresholdHexaNoStats) {
+                WelfordHexaNoStat.add(avgHexaNoStat);
+            }
+
+            altern = !altern;
         }
 
 
