@@ -171,6 +171,59 @@ public class RDFHexaStore implements RDFStorage {
         return true;
     }
 
+    public boolean addWithoutStatistics(RDFTriple triple) {
+        triple = dictionnaire.encode(triple);
+        if (triple==null) {
+            return false;
+        }
+
+        if (triple.getTerm(0)==null ||
+                triple.getTerm(1)==null ||
+                triple.getTerm(2)==null) {
+            return false;
+        }
+
+        if (triple.getTerm(0).isVariable() ||
+                triple.getTerm(1).isVariable() ||
+                triple.getTerm(2).isVariable()) {
+            return false;
+        }
+
+        Integer s = Integer.parseInt(triple.getTerms()[0].label());
+        Integer p = Integer.parseInt(triple.getTerms()[1].label());
+        Integer o = Integer.parseInt(triple.getTerms()[2].label());
+
+
+        addGenericWithoutStatistic(SPO, s, p, o, "SPO");
+        addGenericWithoutStatistic(POS, p, o, s, "POS");
+        addGenericWithoutStatistic(SOP, s, o, p, "SOP");
+        addGenericWithoutStatistic(OPS, o, p, s, "OPS");
+        addGenericWithoutStatistic(OSP, o, s, p, "OSP");
+        addGenericWithoutStatistic(PSO, p, s, o, "PSO");
+
+        return true;
+    }
+
+    public boolean addGenericWithoutStatistic(Map<Integer, SndValue> map, Integer fst, Integer snd, Integer thrd, String mapName) {
+        if (!map.containsKey(fst)) {
+            HashMap<Integer, ThrdValue> fstValueHashMap = new HashMap<>();
+            fstValueHashMap.put(-1, new ThrdValue(0L));
+            map.put(fst, new SndValue(fstValueHashMap));
+
+        }
+        if (!map.get(fst).map.containsKey(snd)) {
+            HashSet<Integer> set = new HashSet<>();
+            map.get(fst).map.put(snd, new ThrdValue(set));
+        }
+
+        Set<Integer> set = map.get(fst).map.get(snd).set;
+        if (set.add(thrd)) { // Increment size only if the element is new
+            incrementSize(mapName);
+        }
+        map.get(fst).map.put(snd, new ThrdValue(set));
+        return true;
+    }
+
     @Override
     public long size() {
         if (checkSynchronization()) return size_SOP;
