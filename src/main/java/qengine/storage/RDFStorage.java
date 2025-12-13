@@ -6,7 +6,7 @@ import java.util.stream.Stream;
 import fr.boreal.model.logicalElements.api.Substitution;
 import qengine.model.RDFTriple;
 import qengine.model.StarQuery;
-import qengine.utils;
+import qengine.utils.utils;
 
 /**
  * Contrat pour un système de stockage de données RDF

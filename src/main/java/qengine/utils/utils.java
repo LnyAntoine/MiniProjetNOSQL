@@ -1,10 +1,9 @@
-package qengine;
+package qengine.utils;
 
 import fr.boreal.model.logicalElements.api.Literal;
 import fr.boreal.model.logicalElements.api.Substitution;
 import fr.boreal.model.logicalElements.factory.impl.SameObjectTermFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

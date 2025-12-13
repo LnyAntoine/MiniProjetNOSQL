@@ -68,9 +68,9 @@ public final class Example {
 			while (rdfAtomParser.hasNext()) {
 				RDFTriple triple = rdfAtomParser.next();
 				rdfAtoms.add(triple);  // Stocker le triplet dans la collection
-				System.out.println("RDF Triple #" + (++count) + ": " + triple);
+				//System.out.println("RDF Triple #" + (++count) + ": " + triple);
 			}
-			System.out.println("Total RDF Triples parsed: " + count);
+			//System.out.println("Total RDF Triples parsed: " + count);
 		}
 		return rdfAtoms;
 	}
@@ -91,15 +91,17 @@ public final class Example {
 				Query query = queryParser.next();
 				if (query instanceof StarQuery starQuery) {
 					starQueries.add(starQuery);  // Stocker la requête dans la collection
-					System.out.println("Star Query #" + (++queryCount) + ":");
+					/*System.out.println("Star Query #" + (++queryCount) + ":");
 					System.out.println("  Central Variable: " + starQuery.getCentralVariable().label());
 					System.out.println("  RDF Atoms:");
+
+					 */
 					starQuery.getRdfAtoms().forEach(triple -> System.out.println("    " + triple));
 				} else {
-					System.err.println("Requête inconnue ignorée.");
+					//System.err.println("Requête inconnue ignorée.");
 				}
 			}
-			System.out.println("Total Queries parsed: " + starQueries.size());
+			//System.out.println("Total Queries parsed: " + starQueries.size());
 		}
 		return starQueries;
 	}
@@ -116,10 +118,10 @@ public final class Example {
 		FOQueryEvaluator<FOFormula> evaluator = GenericFOQueryEvaluator.defaultInstance(); // Créer un évaluateur
 		Iterator<Substitution> queryResults = evaluator.evaluate(foQuery, factBase); // Évaluer la requête
 
-		System.out.printf("Execution of  %s:%n", starQuery);
-		System.out.println("Answers:");
+		//System.out.printf("Execution of  %s:%n", starQuery);
+		//System.out.println("Answers:");
 		if (!queryResults.hasNext()) {
-			System.out.println("No answer.");
+			//System.out.println("No answer.");
 		}
 		return queryResults;
      /*   while (queryResults.hasNext()) {

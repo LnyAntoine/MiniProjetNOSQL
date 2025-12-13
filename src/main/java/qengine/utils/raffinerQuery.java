@@ -1,4 +1,4 @@
-package qengine;
+package qengine.utils;
 
 import fr.boreal.model.kb.api.FactBase;
 import fr.boreal.storage.natives.SimpleInMemoryGraphStore;

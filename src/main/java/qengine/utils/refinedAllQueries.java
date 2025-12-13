@@ -1,4 +1,4 @@
-package qengine;
+package qengine.utils;
 
 import fr.boreal.model.kb.api.FactBase;
 import fr.boreal.storage.natives.SimpleInMemoryGraphStore;
@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static qengine.program.Example.*;
-import static qengine.utils.listFileNamesNio;
+import static qengine.utils.utils.listFileNamesNio;
 
 public class refinedAllQueries {
     private static final String WORKING_DIR = "data/";
