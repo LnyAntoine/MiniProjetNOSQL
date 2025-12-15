@@ -3,6 +3,7 @@ package qengine.storage;
 import org.junit.jupiter.api.Test;
 import qengine.model.RDFTriple;
 import qengine.model.StarQuery;
+import qengine.utils.testForBenchmark;
 
 import java.util.List;
 
@@ -87,75 +88,19 @@ public class BenchGiantTableTest {
     @Test
     public void benchmarkMatchBigSubset() {
         // Implémentation du benchmark à venir
-        try {
-            RDFStorage storage = new GiantTableStore();
-            findOrCreateFile(BIG_SUBSET_FILE_PATH);
-            findOrCreateFile(DATA_500K_FILE);
-            List<RDFTriple> rdfTriples = parseRDFData(DATA_500K_FILE);
-            List<StarQuery> starQueries = parseSparQLQueries(BIG_SUBSET_FILE_PATH);
+        testForBenchmark.test(BIG_SUBSET_FILE_PATH, DATA_500K_FILE, new GiantTableStore());
 
-            Long startTime = System.nanoTime();
-            for (RDFTriple triple : rdfTriples) {
-                storage.add(triple);  // Stocker chaque RDFAtom dans le store
-            }
-            for (StarQuery query : starQueries) {
-                storage.match(query);
-            }
-            Long endTime = System.nanoTime();
-            Long duration = endTime - startTime;
-            System.out.println("Durée totale pour le gros sous-ensemble: " + duration + " nanosecondes");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
     @Test
     public void benchMarkMatchDegree1() {
         // Implémentation du benchmark à venir
-        try {
-            RDFStorage storage = new GiantTableStore();
-            findOrCreateFile(DEGREE_1_FILE);
-            findOrCreateFile(DATA_500K_FILE);
-            List<RDFTriple> rdfTriples = parseRDFData(DATA_500K_FILE);
-            List<StarQuery> starQueries = parseSparQLQueries(DEGREE_1_FILE);
+        testForBenchmark.test(DEGREE_1_FILE_PATH, DATA_500K_FILE, new GiantTableStore());
 
-            Long startTime = System.nanoTime();
-            for (RDFTriple triple : rdfTriples) {
-                storage.add(triple);  // Stocker chaque RDFAtom dans le store
-            }
-            for (StarQuery query : starQueries) {
-                storage.match(query);
-            }
-            Long endTime = System.nanoTime();
-            Long duration = endTime - startTime;
-            System.out.println("Durée totale pour le gros sous-ensemble: " + duration + " nanosecondes");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
     @Test
     public void benchMarkMatchDegree3and4() {
         // Implémentation du benchmark à venir
-
-        try {
-            RDFStorage storage = new RDFHexaStoreNoStatistic();
-            findOrCreateFile(DEGREE_3_4_FILE);
-            findOrCreateFile(DATA_500K_FILE);
-            List<RDFTriple> rdfTriples = parseRDFData(DATA_500K_FILE);
-            List<StarQuery> starQueries = parseSparQLQueries(DEGREE_3_4_FILE);
-
-            Long startTime = System.nanoTime();
-            for (RDFTriple triple : rdfTriples) {
-                storage.add(triple);  // Stocker chaque RDFAtom dans le store
-            }
-            for (StarQuery query : starQueries) {
-                storage.match(query);
-            }
-            Long endTime = System.nanoTime();
-            Long duration = endTime - startTime;
-            System.out.println("Durée totale pour le gros sous-ensemble: " + duration + " nanosecondes");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        testForBenchmark.test(DEGREE_3_4_FILE_PATH, DATA_500K_FILE, new GiantTableStore());
     }
 
 }
