@@ -189,8 +189,8 @@ public class RDFHexaStoreVsNoStatisticTest {
             }
 
             // moyenne par requête dans le batch
-            globalWelfordHexa.add(totalHexa / count);
-            globalWelfordHexaNoStat.add(totalHexaNoStat / count);
+            globalWelfordHexa.add((double) totalHexa / count);
+            globalWelfordHexaNoStat.add((double) totalHexaNoStat / count);
 
             altern = !altern;
         }

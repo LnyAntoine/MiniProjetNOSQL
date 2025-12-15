@@ -96,7 +96,7 @@ public final class Example {
 					System.out.println("  RDF Atoms:");
 
 					 */
-					starQuery.getRdfAtoms().forEach(triple -> System.out.println("    " + triple));
+					//starQuery.getRdfAtoms().forEach(triple -> System.out.println("    " + triple));
 				} else {
 					//System.err.println("Requête inconnue ignorée.");
 				}
