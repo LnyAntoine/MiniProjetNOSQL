@@ -17,9 +17,9 @@ import static qengine.utils.utils.listFileNamesNio;
 public class refinedAllQueries {
     private static final String WORKING_DIR = "data/";
     private static final String TEMPLATE_DIR = "template_degree/";
-    private static final String RSQ_INTPUT_DIR = "";
+    private static final String RSQ_INTPUT_DIR = "watdiv-mini-projet-partie-2/testsuite/queries/template-aug/";
     private static final String RSQ_OUTPUT_DIR = "refined_queries_degree/";
-    private static final String SAMPLE_DATA_FILE = WORKING_DIR + "data2M.nt";
+    private static final String SAMPLE_DATA_FILE = WORKING_DIR + "data500k.nt";
     private static final String QUERIES_1_ELIGIBLE_REGION =  WORKING_DIR+TEMPLATE_DIR + "Q_1_eligibleregion_10000.queryset";
     private static final String QUERIES_1_INCLUDES =  WORKING_DIR+TEMPLATE_DIR + "Q_1_includes_10000.queryset";
     private static final String QUERIES_1_LIKES =  WORKING_DIR+TEMPLATE_DIR + "Q_1_likes_10000.queryset";
@@ -52,10 +52,10 @@ public class refinedAllQueries {
                 int counterDoublons = 0;
                 int cptRequest = 0;
                 int cptRequestNonNull = 0;
-                for (String fileName : listFileNamesNio(WORKING_DIR + TEMPLATE_DIR + RSQ_INTPUT_DIR)) {
+                for (String fileName : listFileNamesNio( RSQ_INTPUT_DIR)) {
                     if (!fileName.startsWith("Q_"+i)) continue;
                     System.out.println("    Fichier trouvé: " + fileName);
-                    String INPUT_QUERY_FILE =  WORKING_DIR + TEMPLATE_DIR + RSQ_INTPUT_DIR + fileName;
+                    String INPUT_QUERY_FILE =  RSQ_INTPUT_DIR + fileName;
 
                     System.out.println("        Nombre de requetes deja presentes dans le fichier de sortie: " + outputQueries.size());
 
