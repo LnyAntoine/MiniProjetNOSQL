@@ -1,4 +1,4 @@
-package qengine;
+package qengine.utils;
 
 import fr.boreal.model.logicalElements.api.Literal;
 import fr.boreal.model.logicalElements.api.Substitution;
@@ -60,6 +60,47 @@ public class utils {
                     .map(Path::getFileName)
                     .map(Path::toString)
                     .collect(Collectors.toList());
+        }
+    }
+    public static void findOrCreateFile(String filePath) throws IOException {
+        File outFile = new File(filePath);
+        if (!outFile.exists()) {
+            File parent = outFile.getParentFile();
+            if (parent != null && !parent.exists()) {
+                boolean createdDir = parent.mkdirs();
+                if (!createdDir) {
+                    throw new IOException("Impossible de créer le dossier parent: " + parent.getAbsolutePath());
+                }
+            }
+            boolean createdFile = outFile.createNewFile();
+            if (!createdFile) {
+                throw new IOException("Impossible de créer le fichier de sortie: " + outFile.getAbsolutePath());
+            }
+        }
+    }
+    public static void replaceOrCreateFile(String filePath) throws IOException {
+        File outFile = new File(filePath);
+        if (!outFile.exists()) {
+            File parent = outFile.getParentFile();
+            if (parent != null && !parent.exists()) {
+                boolean createdDir = parent.mkdirs();
+                if (!createdDir) {
+                    throw new IOException("Impossible de créer le dossier parent: " + parent.getAbsolutePath());
+                }
+            }
+            boolean createdFile = outFile.createNewFile();
+            if (!createdFile) {
+                throw new IOException("Impossible de créer le fichier de sortie: " + outFile.getAbsolutePath());
+            }
+        } else {
+            boolean deleted = outFile.delete();
+            if (!deleted) {
+                throw new IOException("Impossible de supprimer le fichier existant: " + outFile.getAbsolutePath());
+            }
+            boolean createdFile = outFile.createNewFile();
+            if (!createdFile) {
+                throw new IOException("Impossible de créer le fichier de sortie: " + outFile.getAbsolutePath());
+            }
         }
     }
 }

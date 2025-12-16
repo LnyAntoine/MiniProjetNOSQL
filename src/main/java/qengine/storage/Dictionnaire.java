@@ -2,13 +2,12 @@ package qengine.storage;
 
 import fr.boreal.model.logicalElements.api.Literal;
 import fr.boreal.model.logicalElements.api.Term;
-import fr.boreal.model.logicalElements.impl.LiteralImpl;
 import qengine.model.RDFTriple;
 
 import java.util.HashMap;
 
-import static qengine.utils.createLiteralFromObject;
-import static qengine.utils.createLiteralFromString;
+import static qengine.utils.utils.createLiteralFromObject;
+import static qengine.utils.utils.createLiteralFromString;
 
 public class Dictionnaire {
     protected HashMap<String, Integer> tableEncodage;
