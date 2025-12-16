@@ -1,4 +1,4 @@
-package qengine;
+package qengine.utils;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -7,7 +7,7 @@ import java.util.*;
 
 public class distribQueries {
     private static final String WORKING_DIR = "data/";
-    private static final String SAMPLE_QUERY_FILE = WORKING_DIR + "sample_query.queryset";
+    private static final String SAMPLE_QUERY_FILE = WORKING_DIR + "refined_queries_concatenated/refined_queries_concatenated_3_4_2_1.queryset";
     public static void main(String[] args) {
 
         Map<Integer, Integer> degreeDistribution = new HashMap<>();

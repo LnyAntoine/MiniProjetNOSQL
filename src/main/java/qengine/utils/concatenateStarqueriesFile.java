@@ -14,8 +14,8 @@ import static qengine.utils.utils.replaceOrCreateFile;
 public class concatenateStarqueriesFile {
     private static final String WORKING_DIR = "data/";
     private static final String RSQ_INTPUT_DIR = "refined_queries_degree/";
-    private static final String RSQ_OUTPUT_SUBSET_DIR = "refined_queries_concatenated_34_1/";
-    private static final String OUTPUT_FILE_NAME = "refined_queries_concatenated_34";
+    private static final String RSQ_OUTPUT_SUBSET_DIR = "refined_queries_concatenated/";
+    private static final String OUTPUT_FILE_NAME = "refined_queries_concatenated";
 
     private static final String INPUT_FILE_1 = WORKING_DIR + RSQ_INTPUT_DIR + "refined_queries_degree_1.queryset";
     private static final String INPUT_FILE_2 = WORKING_DIR + RSQ_INTPUT_DIR + "refined_queries_degree_2.queryset";
@@ -24,9 +24,9 @@ public class concatenateStarqueriesFile {
 
     private static final List<String> filesToConcatenate = java.util.Arrays.asList(
             INPUT_FILE_3,
-            INPUT_FILE_4
-            //INPUT_FILE_2,
-            //INPUT_FILE_1
+            INPUT_FILE_4,
+            INPUT_FILE_2,
+            INPUT_FILE_1
     );
 
     //Concatene les starqueries des fichiers donnés en entrée en supprimant les doublons
@@ -46,6 +46,9 @@ public class concatenateStarqueriesFile {
             try (java.io.BufferedWriter writer = new java.io.BufferedWriter(new java.io.FileWriter(WORKING_DIR + RSQ_OUTPUT_SUBSET_DIR + OUTPUT_FILE))) {
                 for (StarQuery starQuery : starqueries) {
                     writer.write(starQuery.getLabel());
+                    writer.newLine();
+
+
                 }
             }
             System.out.println("Fichier de requêtes concaténé créé avec succès.");
