@@ -14,10 +14,10 @@ import static qengine.program.Example.parseSparQLQueries;
 
 public class RDFHexaStoreVsNoStatisticTest {
     private static final String WORKING_DIR = "data/";
-    private static final String SAMPLE_DATA_FILE = WORKING_DIR + "sample_data.nt";
-    private static final String SAMPLE_QUERY_FILE = WORKING_DIR + "sample_query.queryset";
-    private static final String SAMPLE_BIG_DATA_FILE = WORKING_DIR + "100K.nt";
-    private static final String SAMPLE_BIG_QUERY_FILE = WORKING_DIR + "STAR_ALL_workload.queryset";
+    private static final String SAMPLE_DATA_FILE = WORKING_DIR + "data500k.nt";
+    private static final String SAMPLE_QUERY_FILE = WORKING_DIR + "subsets/average_subset.queryset";
+    private static final String SAMPLE_BIG_DATA_FILE = WORKING_DIR + "data2M.nt";
+    private static final String SAMPLE_BIG_QUERY_FILE = WORKING_DIR + "subsets/big_subset.queryset";
     @Test
     public void RDFHexaStoreVsNoStatisticTestAdd() throws IOException {
         RDFStorage hexaStore = new RDFHexaStore();
@@ -145,6 +145,10 @@ public class RDFHexaStoreVsNoStatisticTest {
         List<RDFTriple> rdfAtoms = parseRDFData(SAMPLE_BIG_DATA_FILE);
 
         List<StarQuery> starQueries = parseSparQLQueries(SAMPLE_BIG_QUERY_FILE);
+        for (StarQuery query : starQueries) {
+            System.out.println(query.getLabel());
+        }
+
 
         for (RDFTriple atom : rdfAtoms) {
             hexaStore.add(atom);
