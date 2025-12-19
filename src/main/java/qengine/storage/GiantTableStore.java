@@ -30,7 +30,6 @@ public class GiantTableStore implements RDFStorage{
         }
         triple = dictionnaire.encode(triple);
         if (triple==null) {
-            System.out.println("Failed to encode triple: " + triple);
             return false;
         }
         if (triple.getTerm(0)==null ||
@@ -40,7 +39,6 @@ public class GiantTableStore implements RDFStorage{
         }
 
         if (storage.contains(triple)) {
-            System.out.println(triple+" already exists in storage.");
             return true;
         }
         storage.add(triple);
