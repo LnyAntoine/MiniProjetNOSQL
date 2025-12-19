@@ -43,27 +43,51 @@ public class BenchHexaStoreNoStatisticTest {
     }
 
     @Test
-    public void benchmarkMatchLittleSubset() {
+    public void benchmarkMatchLittleSubset_500k() {
         // Implémentation du benchmark à venir
         testForBenchmark.testMatch(LITTLE_SUBSET_FILE_PATH, DATA_500K_FILE, new RDFHexaStoreNoStatistic());
     }
     @Test
-    public void benchmarkMatchAverageSubset() {
+    public void benchmarkMatchLittleSubset_2M() {
+        // Implémentation du benchmark à venir
+        testForBenchmark.testMatch(LITTLE_SUBSET_FILE_PATH, DATA_2M_FILE, new RDFHexaStoreNoStatistic());
+    }
+    @Test
+    public void benchmarkMatchAverageSubset_500k() {
         // Implémentation du benchmark à venir
         testForBenchmark.testMatch(AVERAGE_SUBSET_FILE_PATH, DATA_500K_FILE, new RDFHexaStoreNoStatistic());
     }
     @Test
-    public void benchmarkMatchBigSubset() {
+    public void benchmarkMatchAverageSubset_2M() {
+        // Implémentation du benchmark à venir
+        testForBenchmark.testMatch(AVERAGE_SUBSET_FILE_PATH, DATA_2M_FILE, new RDFHexaStoreNoStatistic());
+    }
+    @Test
+    public void benchmarkMatchBigSubset_500k() {
         testForBenchmark.testMatch(BIG_SUBSET_FILE_PATH, DATA_500K_FILE, new RDFHexaStoreNoStatistic());
     }
     @Test
-    public void benchMarkMatchDegree1() {
+    public void benchmarkMatchBigSubset_2M() {
+        testForBenchmark.testMatch(BIG_SUBSET_FILE_PATH, DATA_2M_FILE, new RDFHexaStoreNoStatistic());
+    }
+    @Test
+    public void benchMarkMatchDegree1_500k() {
         // Implémentation du benchmark à venir
         testForBenchmark.testMatch(DEGREE_34_1_FILE_PATH, DATA_500K_FILE, new RDFHexaStoreNoStatistic());
     }
     @Test
-    public void benchMarkMatchDegree3and4() {
+    public void benchMarkMatchDegree3and4_500k() {
         // Implémentation du benchmark à venir
         testForBenchmark.testMatch(DEGREE_3_4_FILE_PATH, DATA_500K_FILE, new RDFHexaStoreNoStatistic());
+    }
+    @Test
+    public void benchMarkMatchDegree1_2M() {
+        // Implémentation du benchmark à venir
+        testForBenchmark.testMatch(DEGREE_34_1_FILE_PATH, DATA_2M_FILE, new RDFHexaStoreNoStatistic());
+    }
+    @Test
+    public void benchMarkMatchDegree3and4_2M() {
+        // Implémentation du benchmark à venir
+        testForBenchmark.testMatch(DEGREE_3_4_FILE_PATH, DATA_2M_FILE, new RDFHexaStoreNoStatistic());
     }
 }

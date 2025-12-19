@@ -102,20 +102,23 @@ public class RDFHexaStore implements RDFStorage {
             return matchAll(fst, snd, thrd);
         }
 
-        Map<Integer, DataValue> snd_thrd_map =
-                map.get(Integer.parseInt(fst.label())) != null
-                        ? map.get(Integer.parseInt(fst.label())).getMapValue()
-                        : new HashMap<>();
-        if (snd_thrd_map.isEmpty()) {
-            return substitutions;
-        }
+        DataValue dv = map.get(Integer.parseInt(fst.label())) != null
+                ? map.get(Integer.parseInt(fst.label()))
+                : null;
+
+        if (dv == null || !dv.isMap()) return substitutions;
+
+        Map<Integer, DataValue> snd_thrd_map = dv.getMapValue();
+
         if (snd.isLiteral()) {
-            Set<Integer> thrd_set = snd_thrd_map.get(Integer.parseInt(snd.label())) != null
-                    ? snd_thrd_map.get(Integer.parseInt(snd.label())).getSetValue()
-                    : new HashSet<>();
-            if (thrd_set.isEmpty()) {
-                return substitutions;
-            }
+             dv = snd_thrd_map.get(Integer.parseInt(snd.label()))!=null
+                    ?  snd_thrd_map.get(Integer.parseInt(snd.label()))
+                    : null
+            ;
+            if (dv == null || !dv.isSet()) return substitutions;
+
+            Set<Integer> thrd_set = dv.getSetValue();
+
             for (Integer i : thrd_set) {
                 Substitution sub = new SubstitutionImpl();
                 sub.add((Variable) thrd, dictionnaire.getDecodageAsTerm(i));
@@ -123,7 +126,9 @@ public class RDFHexaStore implements RDFStorage {
             }
         } else {
             for (Integer is : snd_thrd_map.keySet()) {
-                Set<Integer> thrd_set = snd_thrd_map.get(is).getSetValue();
+                dv = snd_thrd_map.get(is);
+                if (!dv.isSet()) continue;
+                Set<Integer> thrd_set = dv.getSetValue();
                 for (Integer io : thrd_set) {
                     Substitution sub = new SubstitutionImpl();
                     sub.add((Variable) snd, dictionnaire.getDecodageAsTerm(is));

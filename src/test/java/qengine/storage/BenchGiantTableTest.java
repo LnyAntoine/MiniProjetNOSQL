@@ -62,17 +62,30 @@ public class BenchGiantTableTest {
 
     }
     @Test
-    public void benchMarkMatchDegree1() {
+    public void benchMarkMatchDegree1_500k() {
         // Implémentation du benchmark à venir
         testForBenchmark.testMatch(DEGREE_34_1_FILE_PATH,
                 DATA_500K_FILE, new GiantTableStore());
 
     }
     @Test
-    public void benchMarkMatchDegree3and4() {
+    public void benchMarkMatchDegree1_2M() {
+        // Implémentation du benchmark à venir
+        testForBenchmark.testMatch(DEGREE_34_1_FILE_PATH,
+                DATA_2M_FILE, new GiantTableStore());
+
+    }
+    @Test
+    public void benchMarkMatchDegree3and4_500k() {
         // Implémentation du benchmark à venir
         testForBenchmark.testMatch(DEGREE_3_4_FILE_PATH,
                  DATA_500K_FILE, new GiantTableStore());
+    }
+    @Test
+    public void benchMarkMatchDegree3and4_2M() {
+        // Implémentation du benchmark à venir
+        testForBenchmark.testMatch(DEGREE_3_4_FILE_PATH,
+                 DATA_2M_FILE, new GiantTableStore());
     }
 
 }
