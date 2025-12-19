@@ -2,8 +2,6 @@ package qengine.storage;
 
 import fr.boreal.model.logicalElements.api.*;
 import fr.boreal.model.logicalElements.impl.SubstitutionImpl;
-import org.mapdb.DB;
-import org.mapdb.DBMaker;
 import qengine.model.RDFTriple;
 import qengine.model.StarQuery;
 
@@ -17,12 +15,12 @@ import java.util.*;
  * (Prédicat, Sujet, Objet), (Prédicat, Objet, Sujet), (Objet, Sujet, Prédicat) et (Objet, Prédicat, Sujet).
  */
 public class RDFHexaStore implements RDFStorage {
-    private final Map<Integer,SndValue> SPO;
-    private final Map<Integer,SndValue> POS;
-    private final Map<Integer,SndValue> SOP;
-    private final Map<Integer,SndValue> PSO;
-    private final Map<Integer,SndValue> OSP;
-    private final Map<Integer,SndValue> OPS;
+    private final Map<Integer,DataValue> SPO;
+    private final Map<Integer,DataValue> POS;
+    private final Map<Integer,DataValue> SOP;
+    private final Map<Integer,DataValue> PSO;
+    private final Map<Integer,DataValue> OSP;
+    private final Map<Integer,DataValue> OPS;
     private long size_SPO = 0;
     private long size_POS = 0;
     private long size_SOP = 0;
@@ -49,25 +47,25 @@ public class RDFHexaStore implements RDFStorage {
     }
 
 
-    public boolean addGeneric(Map<Integer, SndValue> map, Integer fst, Integer snd, Integer thrd, String mapName) {
+    public boolean addGeneric(Map<Integer, DataValue> map, Integer fst, Integer snd, Integer thrd, String mapName) {
         if (!map.containsKey(fst)) {
-            HashMap<Integer, ThrdValue> fstValueHashMap = new HashMap<>();
-            fstValueHashMap.put(-1, new ThrdValue(0L));
-            map.put(fst, new SndValue(fstValueHashMap));
-            map.put(-1, new SndValue(0L));
+            HashMap<Integer, DataValue> fstValueHashMap = new HashMap<>();
+            fstValueHashMap.put(-1, new DataValue(0L));
+            map.put(fst, new DataValue(fstValueHashMap));
+            map.put(-1, new DataValue(0L));
         }
-        if (!map.get(fst).map.containsKey(snd)) {
+        if (!map.get(fst).getMapValue().containsKey(snd)) {
             HashSet<Integer> set = new HashSet<>();
-            map.get(fst).map.put(snd, new ThrdValue(set));
-            map.get(fst).map.put(-1, new ThrdValue(0L)); // Nombre de snd pour ce fst
+            map.get(fst).addToMap(snd, new DataValue(set));
+            map.get(fst).addToMap(-1, new DataValue(0L)); // Nombre de snd pour ce fst
         }
 
-        Set<Integer> set = map.get(fst).map.get(snd).set;
+        Set<Integer> set = map.get(fst).getMapValue().get(snd).getSetValue();
         if (set.add(thrd)) { // Increment size only if the element is new
             incrementSize(mapName);
         }
-        map.get(fst).map.put(snd, new ThrdValue(set));
-        map.get(fst).map.put(-1, new ThrdValue(map.get(fst).map.get(-1).stat + 1)); // Incrémenter le nombre de snd pour ce fst
+        map.get(fst).addToMap(snd, new DataValue(set));
+        map.get(fst).addToMap(-1, new DataValue(map.get(fst).getMapValue().get(-1).getLongValue() + 1)); // Incrémenter le nombre de snd pour ce fst
         return true;
     }
     private void incrementSize(String mapName) {
@@ -95,7 +93,7 @@ public class RDFHexaStore implements RDFStorage {
         }
     }
 
-    public ArrayList<Substitution> matchGeneric(Map<Integer,SndValue> map, Term fst, Term snd, Term thrd) {
+    public ArrayList<Substitution> matchGeneric(Map<Integer,DataValue> map, Term fst, Term snd, Term thrd) {
         ArrayList<Substitution> substitutions = new ArrayList<>();
         if (fst == null || snd == null || thrd == null) {
             return substitutions;
@@ -104,16 +102,16 @@ public class RDFHexaStore implements RDFStorage {
             return matchAll(fst, snd, thrd);
         }
 
-        Map<Integer, ThrdValue> snd_thrd_map =
+        Map<Integer, DataValue> snd_thrd_map =
                 map.get(Integer.parseInt(fst.label())) != null
-                        ? map.get(Integer.parseInt(fst.label())).map
+                        ? map.get(Integer.parseInt(fst.label())).getMapValue()
                         : new HashMap<>();
         if (snd_thrd_map.isEmpty()) {
             return substitutions;
         }
         if (snd.isLiteral()) {
             Set<Integer> thrd_set = snd_thrd_map.get(Integer.parseInt(snd.label())) != null
-                    ? snd_thrd_map.get(Integer.parseInt(snd.label())).set
+                    ? snd_thrd_map.get(Integer.parseInt(snd.label())).getSetValue()
                     : new HashSet<>();
             if (thrd_set.isEmpty()) {
                 return substitutions;
@@ -125,7 +123,7 @@ public class RDFHexaStore implements RDFStorage {
             }
         } else {
             for (Integer is : snd_thrd_map.keySet()) {
-                Set<Integer> thrd_set = snd_thrd_map.get(is).set;
+                Set<Integer> thrd_set = snd_thrd_map.get(is).getSetValue();
                 for (Integer io : thrd_set) {
                     Substitution sub = new SubstitutionImpl();
                     sub.add((Variable) snd, dictionnaire.getDecodageAsTerm(is));
@@ -204,23 +202,23 @@ public class RDFHexaStore implements RDFStorage {
         return true;
     }
 
-    public boolean addGenericWithoutStatistic(Map<Integer, SndValue> map, Integer fst, Integer snd, Integer thrd, String mapName) {
+    public boolean addGenericWithoutStatistic(Map<Integer, DataValue> map, Integer fst, Integer snd, Integer thrd, String mapName) {
         if (!map.containsKey(fst)) {
-            HashMap<Integer, ThrdValue> fstValueHashMap = new HashMap<>();
-            fstValueHashMap.put(-1, new ThrdValue(0L));
-            map.put(fst, new SndValue(fstValueHashMap));
+            HashMap<Integer, DataValue> fstValueHashMap = new HashMap<>();
+            fstValueHashMap.put(-1, new DataValue(0L));
+            map.put(fst, new DataValue(fstValueHashMap));
 
         }
-        if (!map.get(fst).map.containsKey(snd)) {
+        if (!map.get(fst).getMapValue().containsKey(snd)) {
             HashSet<Integer> set = new HashSet<>();
-            map.get(fst).map.put(snd, new ThrdValue(set));
+            map.get(fst).addToMap(snd, new DataValue(set));
         }
 
-        Set<Integer> set = map.get(fst).map.get(snd).set;
+        Set<Integer> set = map.get(fst).getMapValue().get(snd).getSetValue();
         if (set.add(thrd)) { // Increment size only if the element is new
             incrementSize(mapName);
         }
-        map.get(fst).map.put(snd, new ThrdValue(set));
+        map.get(fst).getMapValue().put(snd, new DataValue(set));
         return true;
     }
 
@@ -300,16 +298,16 @@ public class RDFHexaStore implements RDFStorage {
             if (!pEncode.equals(-1)) {
                 if (!oEncode.equals(-1)) {
                     howmany = SPO.get(sEncode)!=null
-                            ? SPO.get(sEncode).map.get(pEncode)!=null
-                                ? SPO.get(sEncode).map.get(pEncode).set.contains(oEncode)
+                            ? SPO.get(sEncode).getMapValue().get(pEncode)!=null
+                                ? SPO.get(sEncode).getMapValue().get(pEncode).getSetValue().contains(oEncode)
                                     ? 1L
                                     :0L
                                 : 0L
                             :0L;
                 } else {
                     howmany = SPO.get(sEncode)!=null
-                            ? SPO.get(sEncode).map.get(pEncode)!=null
-                                ? (long) SPO.get(sEncode).map.get(-1).stat
+                            ? SPO.get(sEncode).getMapValue().get(pEncode)!=null
+                                ? (long) SPO.get(sEncode).getMapValue().get(-1).getLongValue()
                                 : 0L
                             :0L;
 
@@ -318,14 +316,14 @@ public class RDFHexaStore implements RDFStorage {
             else {
                 if (!oEncode.equals(-1)) {
                     howmany = SOP.get(sEncode)!=null
-                            ? SOP.get(sEncode).map.get(oEncode)!=null
-                                ? SOP.get(sEncode).map.get(oEncode).stat
+                            ? SOP.get(sEncode).getMapValue().get(oEncode)!=null
+                                ? SOP.get(sEncode).getMapValue().get(oEncode).getLongValue()
                                 : 0L
                             :0L;
                 }
                 else {
                     howmany = SOP.get(sEncode)!=null
-                            ? SOP.get(sEncode).map.get(-1).stat
+                            ? SOP.get(sEncode).getMapValue().get(-1).getLongValue()
                             : 0L;
                 }
 
@@ -334,15 +332,15 @@ public class RDFHexaStore implements RDFStorage {
             if (!pEncode.equals(-1)) {
                 if (!oEncode.equals(-1)) {
                     howmany = POS.get(pEncode)!=null
-                            ? POS.get(pEncode).map.get(oEncode)!=null
-                                ? POS.get(pEncode).map.get(oEncode).stat
+                            ? POS.get(pEncode).getMapValue().get(oEncode)!=null
+                                ? POS.get(pEncode).getMapValue().get(oEncode).getLongValue()
                                 : 0L
                             :0L;
                 }
             } else {
                 if (!oEncode.equals(-1)) {
                     howmany = OPS.get(oEncode)!=null
-                            ? OPS.get(oEncode).map.get(-1).stat
+                            ? OPS.get(oEncode).getMapValue().get(-1).getLongValue()
                             : 0L;
                 }
             }
@@ -357,11 +355,11 @@ public class RDFHexaStore implements RDFStorage {
             if (is.equals(-1)) {
                 continue;
             }
-            for (Integer ip : SPO.get(is).map.keySet()) {
+            for (Integer ip : SPO.get(is).getMapValue().keySet()) {
                 if (ip.equals(-1)) {
                     continue;
                 }
-                for (Integer io : SPO.get(is).map.get(ip).set) {
+                for (Integer io : SPO.get(is).getMapValue().get(ip).getSetValue()) {
                     if (io.equals(-1)) {
                         continue;
                     }
@@ -383,9 +381,9 @@ public class RDFHexaStore implements RDFStorage {
             return substitutions;
         }
         for (Integer is : SPO.keySet()) {
-            Map<Integer, ThrdValue> po_hashmap = SPO.get(is).map;
+            Map<Integer, DataValue> po_hashmap = SPO.get(is).getMapValue();
             for (Integer ip : po_hashmap.keySet()) {
-                Set<Integer> o_set = po_hashmap.get(ip).set;
+                Set<Integer> o_set = po_hashmap.get(ip).getSetValue();
                 for (Integer io : o_set) {
                     Substitution sub = new SubstitutionImpl();
                     sub.add((Variable) s, dictionnaire.getDecodageAsTerm(is));

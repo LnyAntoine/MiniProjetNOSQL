@@ -1,15 +1,7 @@
 package qengine.storage;
 
 import org.junit.jupiter.api.Test;
-import qengine.model.RDFTriple;
-import qengine.model.StarQuery;
 import qengine.utils.testForBenchmark;
-
-import java.util.List;
-
-import static qengine.program.Example.parseRDFData;
-import static qengine.program.Example.parseSparQLQueries;
-import static qengine.utils.utils.findOrCreateFile;
 
 public class BenchHexaStoreTest {
 
@@ -40,34 +32,49 @@ public class BenchHexaStoreTest {
     private static final String BIG_SUBSET_FILE_PATH= WORKING_DIR + DEGREE_DIR + BIG_SUBSET_FILE;
 
 
+    @Test void benchMarkAdd500K(){
+        testForBenchmark.testAdd(DATA_500K_FILE, new RDFHexaStore());
+    }
+    @Test void benchMarkAdd100K(){
+        testForBenchmark.testAdd(DATA_100K_FILE, new RDFHexaStore());
+    }
+    @Test void benchMarkAdd2M(){
+        testForBenchmark.testAdd(DATA_2M_FILE, new RDFHexaStore());
+    }
+
     @Test
     public void benchmarkMatchLittleSubset() {
         // Implémentation du benchmark à venir
-        testForBenchmark.test(LITTLE_SUBSET_FILE_PATH , LITTLE_SUBSET_FILE_PATH, DATA_500K_FILE,new RDFHexaStore());
+        testForBenchmark.testMatch(LITTLE_SUBSET_FILE_PATH ,
+                DATA_500K_FILE,new RDFHexaStore());
     }
     @Test
-    public void benchmarkMatchAverageSubset() {
+    public void benchmarkMatchAverageSubset500k() {
         // Implémentation du benchmark à venir
-        testForBenchmark.test(AVERAGE_SUBSET_FILE_PATH, LITTLE_SUBSET_FILE_PATH ,DATA_500K_FILE,new RDFHexaStore());
-
+        testForBenchmark.testMatch(AVERAGE_SUBSET_FILE_PATH ,DATA_500K_FILE,new RDFHexaStore());
+    }
+    @Test
+    public void benchmarkMatchAverageSubset2M() {
+        // Implémentation du benchmark à venir
+        testForBenchmark.testMatch(AVERAGE_SUBSET_FILE_PATH ,DATA_2M_FILE,new RDFHexaStore());
     }
     @Test
     public void benchmarkMatchBigSubset() {
         // Implémentation du benchmark à venir
-        testForBenchmark.test(BIG_SUBSET_FILE_PATH, LITTLE_SUBSET_FILE_PATH,DATA_500K_FILE,new RDFHexaStore());
+        testForBenchmark.testMatch(BIG_SUBSET_FILE_PATH,DATA_500K_FILE,new RDFHexaStore());
 
     }
     @Test
     public void benchMarkMatchDegree1() {
         // Implémentation du benchmark à venir
-        testForBenchmark.test(DEGREE_34_1_FILE_PATH, LITTLE_SUBSET_FILE_PATH ,DATA_500K_FILE,new RDFHexaStore());
+        testForBenchmark.testMatch(DEGREE_34_1_FILE_PATH ,DATA_500K_FILE,new RDFHexaStore());
 
     }
     @Test
     public void benchMarkMatchDegree3and4() {
         // Implémentation du benchmark à venir
 
-        testForBenchmark.test(DEGREE_3_4_FILE_PATH, LITTLE_SUBSET_FILE_PATH,DATA_500K_FILE,new RDFHexaStore());
+        testForBenchmark.testMatch(DEGREE_3_4_FILE_PATH,DATA_500K_FILE,new RDFHexaStore());
     }
 
 }

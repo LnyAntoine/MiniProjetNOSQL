@@ -36,7 +36,6 @@ public interface RDFStorage {
     default Iterator<Substitution> match(StarQuery q){
         try {
             q.getCentralVariable();
-
             List<RDFTriple> sortedAtoms = sortAtoms(q.getRdfAtoms());
             RDFTriple triple = sortedAtoms.getFirst();
             Iterator<Substitution> it = match(triple);
