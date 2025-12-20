@@ -35,6 +35,10 @@ public class RDFHexaStoreNoStatistic implements RDFStorage {
     private final Dictionnaire dictionnaire;
     //private DB db;
 
+    public String getType(){
+        return "RDFHexaStoreNoStatistic";
+    }
+
     public RDFHexaStoreNoStatistic() {
 
         dictionnaire = new Dictionnaire();

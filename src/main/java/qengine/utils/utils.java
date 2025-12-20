@@ -103,4 +103,12 @@ public class utils {
             }
         }
     }
+    public static void addDataToFile(String filePath, String operation ,String Store,
+                                     String dataFile,
+                                     String queryFile,long timeValue) throws IOException {
+        findOrCreateFile(filePath);
+        Path path = Paths.get(filePath);
+        String data = operation + "," + Store + "," + dataFile + "," + queryFile + "," + timeValue + "\n";
+        Files.writeString(path, data, java.nio.file.StandardOpenOption.APPEND);
+    }
 }

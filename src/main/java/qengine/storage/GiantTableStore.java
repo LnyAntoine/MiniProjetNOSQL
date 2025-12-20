@@ -22,6 +22,11 @@ public class GiantTableStore implements RDFStorage{
     }
 
     @Override
+    public String getType() {
+        return "GiantTableStore";
+    }
+
+    @Override
     public boolean add(RDFTriple triple) {
         if (triple.getTerm(0).isVariable() ||
                 triple.getTerm(1).isVariable() ||

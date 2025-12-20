@@ -13,6 +13,10 @@ import qengine.utils.utils;
  */
 public interface RDFStorage {
 
+    default String getType(){
+        return "RDFStorage";
+    }
+
     /**
      * Ajoute un RDFAtom dans le store.
      *

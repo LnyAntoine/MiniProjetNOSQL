@@ -45,6 +45,9 @@ public class RDFHexaStore implements RDFStorage {
         OPS = new HashMap<>();
 
     }
+    public String getType(){
+        return "RDFHexaStore";
+    }
 
 
     public boolean addGeneric(Map<Integer, DataValue> map, Integer fst, Integer snd, Integer thrd, String mapName) {

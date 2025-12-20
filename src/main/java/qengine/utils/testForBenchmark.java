@@ -11,6 +11,8 @@ import static qengine.program.Example.parseSparQLQueries;
 import static qengine.utils.utils.findOrCreateFile;
 
 public class testForBenchmark {
+    private static final String WORKING_DIR = "data/";
+    private static final String OUTPUT_FILE = "benchmark_results.csv";
     public static long testMatch(String QUERY_FILE,
                                  String DATA_FILE, RDFStorage storage) {
 
@@ -32,6 +34,7 @@ public class testForBenchmark {
             Long endTime = System.nanoTime();
             long duration = endTime - startTime;
             System.out.println("Durée totale pour "+DATA_FILE+ ": " + duration + " nanosecondes");
+            utils.addDataToFile(WORKING_DIR+OUTPUT_FILE,"MATCH" ,storage.getType(), DATA_FILE, QUERY_FILE, duration);
             return duration;
         } catch (Exception e) {
             e.printStackTrace();
@@ -50,6 +53,7 @@ public class testForBenchmark {
             Long endTime = System.nanoTime();
             long duration = endTime - startTime;
             System.out.println("Durée totale pour "+DATA_FILE+ ": " + duration + " nanosecondes");
+            utils.addDataToFile(WORKING_DIR+OUTPUT_FILE,"ADD" ,storage.getType(), DATA_FILE, "N/A", duration);
         } catch (Exception e) {
             e.printStackTrace();
         }
