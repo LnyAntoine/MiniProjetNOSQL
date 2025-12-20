@@ -28,7 +28,7 @@ public class BenchAllTest
     private static final String DEGREE_3_4_FILE = "refined_queries_concatenated_34_3_4.queryset";
     private static final String DEGREE_34_1_FILE = "refined_queries_concatenated_34_1.queryset";
     private static final String DEGREE_3_4_FILE_PATH = WORKING_DIR + RSQ_SUBSET_DIR34 + DEGREE_3_4_FILE;
-    private static final String DEGREE_34_1_FILE_PATH = WORKING_DIR + RSQ_SUBSET_DIR34 + DEGREE_34_1_FILE;
+    private static final String DEGREE_1_FILE_PATH = WORKING_DIR + RSQ_SUBSET_DIR34 + DEGREE_34_1_FILE;
 
 
     private static final String LITTLE_SUBSET_FILE = "little_subset.queryset";
@@ -176,7 +176,7 @@ public class BenchAllTest
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
         for (int i = 0; i < NUM_RUNS_2M; i++) {
             long startTime = System.nanoTime();
-            testForBenchmark.testMatch(AVERAGE_SUBSET_FILE_PATH, DATA_2M_FILE, new GiantTableStore());
+            testForBenchmark.testMatch(LITTLE_SUBSET_FILE_PATH, DATA_2M_FILE, new RDFHexaStoreNoStatistic());
             long endTime = System.nanoTime();
             long duration = endTime - startTime;
             welfordAlgorithm.add(duration);
@@ -269,7 +269,7 @@ public class BenchAllTest
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
         for (int i = 0; i < NUM_RUNS_2M; i++) {
             long startTime = System.nanoTime();
-            testForBenchmark.testMatch(BIG_SUBSET_FILE_PATH, DATA_2M_FILE, new GiantTableStore());
+            testForBenchmark.testMatch(BIG_SUBSET_FILE_PATH, DATA_2M_FILE, new RDFHexaStoreNoStatistic());
             long endTime = System.nanoTime();
             long duration = endTime - startTime;
             welfordAlgorithm.add(duration);
@@ -315,7 +315,7 @@ public class BenchAllTest
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
         for (int i = 0; i < NUM_RUNS_2M; i++) {
             long startTime = System.nanoTime();
-            testForBenchmark.testMatch(DEGREE_3_4_FILE_PATH, DATA_2M_FILE, new GiantTableStore());
+            testForBenchmark.testMatch(DEGREE_3_4_FILE_PATH, DATA_2M_FILE, new RDFHexaStoreNoStatistic());
             long endTime = System.nanoTime();
             long duration = endTime - startTime;
             welfordAlgorithm.add(duration);
@@ -330,7 +330,7 @@ public class BenchAllTest
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
         for (int i = 0; i < NUM_RUNS_2M; i++) {
             long startTime = System.nanoTime();
-            testForBenchmark.testMatch(DEGREE_34_1_FILE_PATH, DATA_2M_FILE, new GiantTableStore());
+            testForBenchmark.testMatch(DEGREE_1_FILE_PATH, DATA_2M_FILE, new GiantTableStore());
             long endTime = System.nanoTime();
             long duration = endTime - startTime;
             welfordAlgorithm.add(duration);
@@ -345,7 +345,7 @@ public class BenchAllTest
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
         for (int i = 0; i < NUM_RUNS_2M; i++) {
             long startTime = System.nanoTime();
-            testForBenchmark.testMatch(DEGREE_34_1_FILE_PATH, DATA_2M_FILE, new RDFHexaStore());
+            testForBenchmark.testMatch(DEGREE_1_FILE_PATH, DATA_2M_FILE, new RDFHexaStore());
             long endTime = System.nanoTime();
             long duration = endTime - startTime;
             welfordAlgorithm.add(duration);
@@ -360,7 +360,7 @@ public class BenchAllTest
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
         for (int i = 0; i < NUM_RUNS_2M; i++) {
             long startTime = System.nanoTime();
-            testForBenchmark.testMatch(DEGREE_34_1_FILE_PATH, DATA_2M_FILE, new GiantTableStore());
+            testForBenchmark.testMatch(DEGREE_1_FILE_PATH, DATA_2M_FILE, new RDFHexaStoreNoStatistic());
             long endTime = System.nanoTime();
             long duration = endTime - startTime;
             welfordAlgorithm.add(duration);
@@ -406,7 +406,7 @@ public class BenchAllTest
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
         for (int i = 0; i < NUM_RUNS_500K; i++) {
             long startTime = System.nanoTime();
-            testForBenchmark.testMatch(AVERAGE_SUBSET_FILE_PATH, DATA_500K_FILE, new GiantTableStore());
+            testForBenchmark.testMatch(LITTLE_SUBSET_FILE_PATH, DATA_500K_FILE, new RDFHexaStoreNoStatistic());
             long endTime = System.nanoTime();
             long duration = endTime - startTime;
             welfordAlgorithm.add(duration);
@@ -499,7 +499,7 @@ public class BenchAllTest
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
         for (int i = 0; i < NUM_RUNS_500K; i++) {
             long startTime = System.nanoTime();
-            testForBenchmark.testMatch(BIG_SUBSET_FILE_PATH, DATA_500K_FILE, new GiantTableStore());
+            testForBenchmark.testMatch(BIG_SUBSET_FILE_PATH, DATA_500K_FILE, new RDFHexaStoreNoStatistic());
             long endTime = System.nanoTime();
             long duration = endTime - startTime;
             welfordAlgorithm.add(duration);
@@ -545,7 +545,7 @@ public class BenchAllTest
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
         for (int i = 0; i < NUM_RUNS_500K; i++) {
             long startTime = System.nanoTime();
-            testForBenchmark.testMatch(DEGREE_3_4_FILE_PATH, DATA_500K_FILE, new GiantTableStore());
+            testForBenchmark.testMatch(DEGREE_3_4_FILE_PATH, DATA_500K_FILE, new RDFHexaStoreNoStatistic());
             long endTime = System.nanoTime();
             long duration = endTime - startTime;
             welfordAlgorithm.add(duration);
@@ -560,7 +560,7 @@ public class BenchAllTest
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
         for (int i = 0; i < NUM_RUNS_500K; i++) {
             long startTime = System.nanoTime();
-            testForBenchmark.testMatch(DEGREE_34_1_FILE_PATH, DATA_500K_FILE, new GiantTableStore());
+            testForBenchmark.testMatch(DEGREE_1_FILE_PATH, DATA_500K_FILE, new GiantTableStore());
             long endTime = System.nanoTime();
             long duration = endTime - startTime;
             welfordAlgorithm.add(duration);
@@ -575,7 +575,7 @@ public class BenchAllTest
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
         for (int i = 0; i < NUM_RUNS_500K; i++) {
             long startTime = System.nanoTime();
-            testForBenchmark.testMatch(DEGREE_34_1_FILE_PATH, DATA_500K_FILE, new RDFHexaStore());
+            testForBenchmark.testMatch(DEGREE_1_FILE_PATH, DATA_500K_FILE, new RDFHexaStore());
             long endTime = System.nanoTime();
             long duration = endTime - startTime;
             welfordAlgorithm.add(duration);
@@ -590,7 +590,7 @@ public class BenchAllTest
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
         for (int i = 0; i < NUM_RUNS_500K; i++) {
             long startTime = System.nanoTime();
-            testForBenchmark.testMatch(DEGREE_34_1_FILE_PATH, DATA_500K_FILE, new GiantTableStore());
+            testForBenchmark.testMatch(DEGREE_1_FILE_PATH, DATA_500K_FILE, new RDFHexaStoreNoStatistic());
             long endTime = System.nanoTime();
             long duration = endTime - startTime;
             welfordAlgorithm.add(duration);
