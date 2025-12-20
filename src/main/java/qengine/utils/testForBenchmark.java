@@ -11,7 +11,7 @@ import static qengine.program.Example.parseSparQLQueries;
 import static qengine.utils.utils.findOrCreateFile;
 
 public class testForBenchmark {
-    public static void testMatch(String QUERY_FILE,
+    public static long testMatch(String QUERY_FILE,
                                  String DATA_FILE, RDFStorage storage) {
 
         try {
@@ -32,8 +32,10 @@ public class testForBenchmark {
             Long endTime = System.nanoTime();
             long duration = endTime - startTime;
             System.out.println("Durée totale pour "+DATA_FILE+ ": " + duration + " nanosecondes");
+            return duration;
         } catch (Exception e) {
             e.printStackTrace();
+            return 0;
         }
     }
     public static void testAdd(
