@@ -78,6 +78,25 @@ public class utils {
             }
         }
     }
+
+    public static void findOrCreateFileOutputCSV(String filePath) throws IOException {
+        File outFile = new File(filePath);
+        if (!outFile.exists()) {
+            File parent = outFile.getParentFile();
+            if (parent != null && !parent.exists()) {
+                boolean createdDir = parent.mkdirs();
+                if (!createdDir) {
+                    throw new IOException("Impossible de créer le dossier parent: " + parent.getAbsolutePath());
+                }
+                String header = "operation_type,storage_name,data_file_path,query_file_path,duration_ns\n";
+                Files.writeString(Paths.get(filePath), header);
+            }
+            boolean createdFile = outFile.createNewFile();
+            if (!createdFile) {
+                throw new IOException("Impossible de créer le fichier de sortie: " + outFile.getAbsolutePath());
+            }
+        }
+    }
     public static void replaceOrCreateFile(String filePath) throws IOException {
         File outFile = new File(filePath);
         if (!outFile.exists()) {
@@ -103,10 +122,10 @@ public class utils {
             }
         }
     }
-    public static void addDataToFile(String filePath, String operation ,String Store,
-                                     String dataFile,
-                                     String queryFile,long timeValue) throws IOException {
-        findOrCreateFile(filePath);
+    public static void addDataToOutPutCSV(String filePath, String operation , String Store,
+                                          String dataFile,
+                                          String queryFile, long timeValue) throws IOException {
+        findOrCreateFileOutputCSV(filePath);
         Path path = Paths.get(filePath);
         String data = operation + "," + Store + "," + dataFile + "," + queryFile + "," + timeValue + "\n";
         Files.writeString(path, data, java.nio.file.StandardOpenOption.APPEND);
