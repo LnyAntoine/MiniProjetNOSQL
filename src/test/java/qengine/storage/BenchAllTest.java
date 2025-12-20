@@ -49,6 +49,20 @@ public class BenchAllTest
     }
 
     @Test
+    public void bencmarkMatchHSNS(){
+        benchmarkMatchHSNS_LTL_2M();
+        benchmarkMatchHSNS_AVG_2M();
+        benchmarkMatchHSNS_BIG_2M();
+        benchmarkMatchHSNS_D34_2M();
+        benchmarkMatchHSNS_D1_2M();
+        benchmarkMatchHSNS_LTL_500K();
+        benchmarkMatchHSNS_AVG_500K();
+        benchmarkMatchHSNS_BIG_500K();
+        benchmarkMatchHSNS_D34_500K();
+        benchmarkMatchHSNS_D1_500K();
+    }
+
+    @Test
     public void benchmarkAddGT_2M() {
         // Implémentation du benchmark à venir
         System.out.println("--- Benchmark GiantTableStore Add 2M ---");
