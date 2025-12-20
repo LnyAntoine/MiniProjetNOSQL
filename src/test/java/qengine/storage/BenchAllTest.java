@@ -6,6 +6,12 @@ import qengine.utils.testForBenchmark;
 
 public class BenchAllTest
 {
+    private static final int NUM_RUNS_2M = 1;
+    private static final int NUM_RUNS_500K = 10;
+
+    private static final int NUM_RUNS_ADD_2M = 10;
+    private static final int NUM_RUNS_ADD_500K = 10;
+
     private static final String WORKING_DIR = "data/";
     private static final String RSQ_SUBSET_DIR = "subsets/";
     private static final String RSQ_SUBSET_DIR34 = "refined_queries_concatenated_34_1/";
@@ -33,11 +39,112 @@ public class BenchAllTest
     private static final String BIG_SUBSET_FILE_PATH= WORKING_DIR + DEGREE_DIR + BIG_SUBSET_FILE;
 
     @Test
+    public void benchmarkAddAll(){
+        benchmarkAddGT_2M();
+        benchmarkAddHS_2M();
+        benchmarkAddHSNS_2M();
+        benchmarkAddGT_500K();
+        benchmarkAddHS_500K();
+        benchmarkAddHSNS_500K();
+    }
+
+    @Test
+    public void benchmarkAddGT_2M() {
+        // Implémentation du benchmark à venir
+        System.out.println("--- Benchmark GiantTableStore Add 2M ---");
+        WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
+        for (int i = 0; i < NUM_RUNS_ADD_2M; i++) {
+            long startTime = System.nanoTime();
+            testForBenchmark.testAdd(DATA_2M_FILE, new GiantTableStore());
+            long endTime = System.nanoTime();
+            long duration = endTime - startTime;
+            welfordAlgorithm.add(duration);
+        }
+        System.out.println("GiantTableStore temps moyen : " + welfordAlgorithm.getMean() + " ns");
+        System.out.println("GiantTableStore écart type : " + welfordAlgorithm.getStdDev() + " ns");
+    }
+    @Test
+    public void benchmarkAddHS_2M() {
+        // Implémentation du benchmark à venir
+        System.out.println("--- Benchmark RDFHexaStore Add 2M ---");
+        WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
+        for (int i = 0; i < NUM_RUNS_ADD_2M; i++) {
+            long startTime = System.nanoTime();
+            testForBenchmark.testAdd(DATA_2M_FILE, new RDFHexaStore());
+            long endTime = System.nanoTime();
+            long duration = endTime - startTime;
+            welfordAlgorithm.add(duration);
+        }
+        System.out.println("HexaStore temps moyen : " + welfordAlgorithm.getMean() + " ns");
+        System.out.println("HexaStore écart type : " + welfordAlgorithm.getStdDev() + " ns");
+    }
+    @Test
+    public void benchmarkAddHSNS_2M() {
+        // Implémentation du benchmark à venir
+        System.out.println("--- Benchmark RDFHexaStoreNoStatistic Add 2M ---");
+        WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
+        for (int i = 0; i < NUM_RUNS_ADD_2M; i++) {
+            long startTime = System.nanoTime();
+            testForBenchmark.testAdd(DATA_2M_FILE, new RDFHexaStoreNoStatistic());
+            long endTime = System.nanoTime();
+            long duration = endTime - startTime;
+            welfordAlgorithm.add(duration);
+        }
+        System.out.println("HexaStoreNoStats temps moyen : " + welfordAlgorithm.getMean() + " ns");
+        System.out.println("HexaStoreNoStats écart type : " + welfordAlgorithm.getStdDev() + " ns");
+    }
+    @Test
+    public void benchmarkAddGT_500K() {
+        // Implémentation du benchmark à venir
+        System.out.println("--- Benchmark GiantTableStore Add 500K ---");
+        WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
+        for (int i = 0; i < NUM_RUNS_ADD_500K; i++) {
+            long startTime = System.nanoTime();
+            testForBenchmark.testAdd(DATA_500K_FILE, new GiantTableStore());
+            long endTime = System.nanoTime();
+            long duration = endTime - startTime;
+            welfordAlgorithm.add(duration);
+        }
+        System.out.println("GiantTableStore temps moyen : " + welfordAlgorithm.getMean() + " ns");
+        System.out.println("GiantTableStore écart type : " + welfordAlgorithm.getStdDev() + " ns");
+    }
+    @Test
+    public void benchmarkAddHS_500K() {
+        // Implémentation du benchmark à venir
+        System.out.println("--- Benchmark RDFHexaStore Add 500K ---");
+        WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
+        for (int i = 0; i < NUM_RUNS_ADD_500K; i++) {
+            long startTime = System.nanoTime();
+            testForBenchmark.testAdd(DATA_500K_FILE, new RDFHexaStore());
+            long endTime = System.nanoTime();
+            long duration = endTime - startTime;
+            welfordAlgorithm.add(duration);
+        }
+        System.out.println("HexaStore temps moyen : " + welfordAlgorithm.getMean() + " ns");
+        System.out.println("HexaStore écart type : " + welfordAlgorithm.getStdDev() + " ns");
+    }
+    @Test
+    public void benchmarkAddHSNS_500K() {
+        // Implémentation du benchmark à venir
+        System.out.println("--- Benchmark RDFHexaStoreNoStatistic Add 500K ---");
+        WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
+        for (int i = 0; i < NUM_RUNS_ADD_500K; i++) {
+            long startTime = System.nanoTime();
+            testForBenchmark.testAdd(DATA_500K_FILE, new RDFHexaStoreNoStatistic());
+            long endTime = System.nanoTime();
+            long duration = endTime - startTime;
+            welfordAlgorithm.add(duration);
+        }
+        System.out.println("HexaStoreNoStats temps moyen : " + welfordAlgorithm.getMean() + " ns");
+        System.out.println("HexaStoreNoStats écart type : " + welfordAlgorithm.getStdDev() + " ns");
+    }
+
+    @Test
     public void benchmarkMatchGT_LTL_2M() {
         // Implémentation du benchmark à venir
         System.out.println("--- Benchmark GiantTableStore Little 2M ---");
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NUM_RUNS_2M; i++) {
             long startTime = System.nanoTime();
             testForBenchmark.testMatch(LITTLE_SUBSET_FILE_PATH, DATA_2M_FILE, new GiantTableStore());
             long endTime = System.nanoTime();
@@ -52,7 +159,7 @@ public class BenchAllTest
         // Implémentation du benchmark à venir
         System.out.println("--- Benchmark Hexastore LittleSubset 2M ---");
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NUM_RUNS_2M; i++) {
             long startTime = System.nanoTime();
             testForBenchmark.testMatch(LITTLE_SUBSET_FILE_PATH, DATA_2M_FILE, new RDFHexaStore());
             long endTime = System.nanoTime();
@@ -67,7 +174,7 @@ public class BenchAllTest
         // Implémentation du benchmark à venir
         System.out.println("--- Benchmark HexaStoreNoStats LittleSubset 2M ---");
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NUM_RUNS_2M; i++) {
             long startTime = System.nanoTime();
             testForBenchmark.testMatch(AVERAGE_SUBSET_FILE_PATH, DATA_2M_FILE, new GiantTableStore());
             long endTime = System.nanoTime();
@@ -84,7 +191,7 @@ public class BenchAllTest
         // Implémentation du benchmark à venir
         System.out.println("--- Benchmark GiantTableStore AVGSubset 2M ---");
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i <NUM_RUNS_2M; i++) {
             long startTime = System.nanoTime();
             testForBenchmark.testMatch(AVERAGE_SUBSET_FILE_PATH, DATA_2M_FILE, new GiantTableStore());
             long endTime = System.nanoTime();
@@ -99,7 +206,7 @@ public class BenchAllTest
         System.out.println("--- Benchmark RDFHexaStore AVGSubset 2M ---");
         // Implémentation du benchmark à venir
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NUM_RUNS_2M; i++) {
             long startTime = System.nanoTime();
             testForBenchmark.testMatch(AVERAGE_SUBSET_FILE_PATH, DATA_2M_FILE, new RDFHexaStore());
             long endTime = System.nanoTime();
@@ -114,7 +221,7 @@ public class BenchAllTest
         System.out.println("--- Benchmark RDFHexaStoreNoStatistic AVGSubset 2M ---");
         // Implémentation du benchmark à venir
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NUM_RUNS_2M; i++) {
             long startTime = System.nanoTime();
             testForBenchmark.testMatch(AVERAGE_SUBSET_FILE_PATH, DATA_2M_FILE, new RDFHexaStoreNoStatistic());
             long endTime = System.nanoTime();
@@ -130,7 +237,7 @@ public class BenchAllTest
         // Implémentation du benchmark à venir
         System.out.println("--- Benchmark GiantTableStore Big 2M ---");
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NUM_RUNS_2M; i++) {
             long startTime = System.nanoTime();
             testForBenchmark.testMatch(BIG_SUBSET_FILE_PATH, DATA_2M_FILE, new GiantTableStore());
             long endTime = System.nanoTime();
@@ -145,7 +252,7 @@ public class BenchAllTest
         // Implémentation du benchmark à venir
         System.out.println("--- Benchmark Hexastore BigSubset 2M ---");
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NUM_RUNS_2M; i++) {
             long startTime = System.nanoTime();
             testForBenchmark.testMatch(BIG_SUBSET_FILE_PATH, DATA_2M_FILE, new RDFHexaStore());
             long endTime = System.nanoTime();
@@ -160,7 +267,7 @@ public class BenchAllTest
         // Implémentation du benchmark à venir
         System.out.println("--- Benchmark HexaStoreNoStats BigSubset 2M ---");
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NUM_RUNS_2M; i++) {
             long startTime = System.nanoTime();
             testForBenchmark.testMatch(BIG_SUBSET_FILE_PATH, DATA_2M_FILE, new GiantTableStore());
             long endTime = System.nanoTime();
@@ -176,7 +283,7 @@ public class BenchAllTest
         // Implémentation du benchmark à venir
         System.out.println("--- Benchmark GiantTableStore Degree 3+4 2M ---");
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NUM_RUNS_2M; i++) {
             long startTime = System.nanoTime();
             testForBenchmark.testMatch(DEGREE_3_4_FILE_PATH, DATA_2M_FILE, new GiantTableStore());
             long endTime = System.nanoTime();
@@ -191,7 +298,7 @@ public class BenchAllTest
         // Implémentation du benchmark à venir
         System.out.println("--- Benchmark Hexastore Degree 3+4 2M ---");
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NUM_RUNS_2M; i++) {
             long startTime = System.nanoTime();
             testForBenchmark.testMatch(DEGREE_3_4_FILE_PATH, DATA_2M_FILE, new RDFHexaStore());
             long endTime = System.nanoTime();
@@ -206,7 +313,7 @@ public class BenchAllTest
         // Implémentation du benchmark à venir
         System.out.println("--- Benchmark HexaStoreNoStats Degree 3+4 2M ---");
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NUM_RUNS_2M; i++) {
             long startTime = System.nanoTime();
             testForBenchmark.testMatch(DEGREE_3_4_FILE_PATH, DATA_2M_FILE, new GiantTableStore());
             long endTime = System.nanoTime();
@@ -221,7 +328,7 @@ public class BenchAllTest
         // Implémentation du benchmark à venir
         System.out.println("--- Benchmark GiantTableStore Degree 1 2M ---");
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NUM_RUNS_2M; i++) {
             long startTime = System.nanoTime();
             testForBenchmark.testMatch(DEGREE_34_1_FILE_PATH, DATA_2M_FILE, new GiantTableStore());
             long endTime = System.nanoTime();
@@ -236,7 +343,7 @@ public class BenchAllTest
         // Implémentation du benchmark à venir
         System.out.println("--- Benchmark Hexastore Degree 1 2M ---");
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NUM_RUNS_2M; i++) {
             long startTime = System.nanoTime();
             testForBenchmark.testMatch(DEGREE_34_1_FILE_PATH, DATA_2M_FILE, new RDFHexaStore());
             long endTime = System.nanoTime();
@@ -251,7 +358,7 @@ public class BenchAllTest
         // Implémentation du benchmark à venir
         System.out.println("--- Benchmark HexaStoreNoStats Degree 1 2M ---");
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NUM_RUNS_2M; i++) {
             long startTime = System.nanoTime();
             testForBenchmark.testMatch(DEGREE_34_1_FILE_PATH, DATA_2M_FILE, new GiantTableStore());
             long endTime = System.nanoTime();
@@ -267,7 +374,7 @@ public class BenchAllTest
         // Implémentation du benchmark à venir
         System.out.println("--- Benchmark GiantTableStore Little 500K ---");
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NUM_RUNS_500K; i++) {
             long startTime = System.nanoTime();
             testForBenchmark.testMatch(LITTLE_SUBSET_FILE_PATH, DATA_500K_FILE, new GiantTableStore());
             long endTime = System.nanoTime();
@@ -282,7 +389,7 @@ public class BenchAllTest
         // Implémentation du benchmark à venir
         System.out.println("--- Benchmark Hexastore LittleSubset 500K ---");
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NUM_RUNS_500K; i++) {
             long startTime = System.nanoTime();
             testForBenchmark.testMatch(LITTLE_SUBSET_FILE_PATH, DATA_500K_FILE, new RDFHexaStore());
             long endTime = System.nanoTime();
@@ -297,7 +404,7 @@ public class BenchAllTest
         // Implémentation du benchmark à venir
         System.out.println("--- Benchmark HexaStoreNoStats LittleSubset 500K ---");
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NUM_RUNS_500K; i++) {
             long startTime = System.nanoTime();
             testForBenchmark.testMatch(AVERAGE_SUBSET_FILE_PATH, DATA_500K_FILE, new GiantTableStore());
             long endTime = System.nanoTime();
@@ -314,7 +421,7 @@ public class BenchAllTest
         // Implémentation du benchmark à venir
         System.out.println("--- Benchmark GiantTableStore AVGSubset 500K ---");
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NUM_RUNS_500K; i++) {
             long startTime = System.nanoTime();
             testForBenchmark.testMatch(AVERAGE_SUBSET_FILE_PATH, DATA_500K_FILE, new GiantTableStore());
             long endTime = System.nanoTime();
@@ -329,7 +436,7 @@ public class BenchAllTest
         System.out.println("--- Benchmark RDFHexaStore AVGSubset 500K ---");
         // Implémentation du benchmark à venir
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NUM_RUNS_500K; i++) {
             long startTime = System.nanoTime();
             testForBenchmark.testMatch(AVERAGE_SUBSET_FILE_PATH, DATA_500K_FILE, new RDFHexaStore());
             long endTime = System.nanoTime();
@@ -344,7 +451,7 @@ public class BenchAllTest
         System.out.println("--- Benchmark RDFHexaStoreNoStatistic AVGSubset 500K ---");
         // Implémentation du benchmark à venir
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NUM_RUNS_500K; i++) {
             long startTime = System.nanoTime();
             testForBenchmark.testMatch(AVERAGE_SUBSET_FILE_PATH, DATA_500K_FILE, new RDFHexaStoreNoStatistic());
             long endTime = System.nanoTime();
@@ -360,7 +467,7 @@ public class BenchAllTest
         // Implémentation du benchmark à venir
         System.out.println("--- Benchmark GiantTableStore Big 500K ---");
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NUM_RUNS_500K; i++) {
             long startTime = System.nanoTime();
             testForBenchmark.testMatch(BIG_SUBSET_FILE_PATH, DATA_500K_FILE, new GiantTableStore());
             long endTime = System.nanoTime();
@@ -375,7 +482,7 @@ public class BenchAllTest
         // Implémentation du benchmark à venir
         System.out.println("--- Benchmark Hexastore BigSubset 500K ---");
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NUM_RUNS_500K; i++) {
             long startTime = System.nanoTime();
             testForBenchmark.testMatch(BIG_SUBSET_FILE_PATH, DATA_500K_FILE, new RDFHexaStore());
             long endTime = System.nanoTime();
@@ -390,7 +497,7 @@ public class BenchAllTest
         // Implémentation du benchmark à venir
         System.out.println("--- Benchmark HexaStoreNoStats BigSubset 500K ---");
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NUM_RUNS_500K; i++) {
             long startTime = System.nanoTime();
             testForBenchmark.testMatch(BIG_SUBSET_FILE_PATH, DATA_500K_FILE, new GiantTableStore());
             long endTime = System.nanoTime();
@@ -406,7 +513,7 @@ public class BenchAllTest
         // Implémentation du benchmark à venir
         System.out.println("--- Benchmark GiantTableStore Degree 3+4 500K ---");
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NUM_RUNS_500K; i++) {
             long startTime = System.nanoTime();
             testForBenchmark.testMatch(DEGREE_3_4_FILE_PATH, DATA_500K_FILE, new GiantTableStore());
             long endTime = System.nanoTime();
@@ -421,7 +528,7 @@ public class BenchAllTest
         // Implémentation du benchmark à venir
         System.out.println("--- Benchmark Hexastore Degree 3+4 500K ---");
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NUM_RUNS_500K; i++) {
             long startTime = System.nanoTime();
             testForBenchmark.testMatch(DEGREE_3_4_FILE_PATH, DATA_500K_FILE, new RDFHexaStore());
             long endTime = System.nanoTime();
@@ -436,7 +543,7 @@ public class BenchAllTest
         // Implémentation du benchmark à venir
         System.out.println("--- Benchmark HexaStoreNoStats Degree 3+4 500K ---");
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NUM_RUNS_500K; i++) {
             long startTime = System.nanoTime();
             testForBenchmark.testMatch(DEGREE_3_4_FILE_PATH, DATA_500K_FILE, new GiantTableStore());
             long endTime = System.nanoTime();
@@ -451,7 +558,7 @@ public class BenchAllTest
         // Implémentation du benchmark à venir
         System.out.println("--- Benchmark GiantTableStore Degree 1 500K ---");
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NUM_RUNS_500K; i++) {
             long startTime = System.nanoTime();
             testForBenchmark.testMatch(DEGREE_34_1_FILE_PATH, DATA_500K_FILE, new GiantTableStore());
             long endTime = System.nanoTime();
@@ -466,7 +573,7 @@ public class BenchAllTest
         // Implémentation du benchmark à venir
         System.out.println("--- Benchmark Hexastore Degree 1 500K ---");
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NUM_RUNS_500K; i++) {
             long startTime = System.nanoTime();
             testForBenchmark.testMatch(DEGREE_34_1_FILE_PATH, DATA_500K_FILE, new RDFHexaStore());
             long endTime = System.nanoTime();
@@ -481,7 +588,7 @@ public class BenchAllTest
         // Implémentation du benchmark à venir
         System.out.println("--- Benchmark HexaStoreNoStats Degree 1 500K ---");
         WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NUM_RUNS_500K; i++) {
             long startTime = System.nanoTime();
             testForBenchmark.testMatch(DEGREE_34_1_FILE_PATH, DATA_500K_FILE, new GiantTableStore());
             long endTime = System.nanoTime();
