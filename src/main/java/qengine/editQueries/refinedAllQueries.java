@@ -1,4 +1,4 @@
-package qengine.utils;
+package qengine.editQueries;
 
 import fr.boreal.model.kb.api.FactBase;
 import fr.boreal.storage.natives.SimpleInMemoryGraphStore;

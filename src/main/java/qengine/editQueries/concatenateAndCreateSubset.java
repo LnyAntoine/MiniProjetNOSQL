@@ -1,4 +1,4 @@
-package qengine.utils;
+package qengine.editQueries;
 
 import qengine.model.StarQuery;
 

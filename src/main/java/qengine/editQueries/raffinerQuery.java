@@ -1,13 +1,14 @@
-package qengine.utils;
+package qengine.editQueries;
 
 import fr.boreal.model.kb.api.FactBase;
 import fr.boreal.storage.natives.SimpleInMemoryGraphStore;
 import qengine.model.RDFTriple;
 import qengine.model.StarQuery;
+import qengine.utils.utils;
+
 import static qengine.program.Example.*;
 
 import java.io.IOException;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
 import java.io.PrintWriter;
