@@ -1,7 +1,6 @@
 package qengine.storage;
 
 import org.junit.jupiter.api.Test;
-import qengine.utils.WelfordAlgorithm;
 import qengine.utils.testForBenchmark;
 
 public class BenchAllTest
@@ -257,154 +256,75 @@ public class BenchAllTest
     @Test
     public void benchmarkMatchHSNS_AVG_500K() {
         System.out.println("--- Benchmark RDFHexaStoreNoStatistic AVGSubset 500K ---");
-        // Implémentation du benchmark à venir
-        WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
         for (int i = 0; i < NUM_RUNS_500K; i++) {
-            long startTime = System.nanoTime();
             testForBenchmark.testMatch(AVERAGE_SUBSET_FILE_PATH, DATA_500K_FILE, new RDFHexaStoreNoStatistic());
-            long endTime = System.nanoTime();
-            long duration = endTime - startTime;
-            welfordAlgorithm.add(duration);
+
         }
-        System.out.println("HexaStoreNoStats temps moyen : " + welfordAlgorithm.getMean() + " ns");
-        System.out.println("HexaStoreNoStats écart type : " + welfordAlgorithm.getStdDev() + " ns");
     }
 
     @Test
     public void benchmarkMatchGT_BIG_500K() {
-        // Implémentation du benchmark à venir
         System.out.println("--- Benchmark GiantTableStore Big 500K ---");
-        WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
         for (int i = 0; i < NUM_RUNS_500K; i++) {
-            long startTime = System.nanoTime();
             testForBenchmark.testMatch(BIG_SUBSET_FILE_PATH, DATA_500K_FILE, new GiantTableStore());
-            long endTime = System.nanoTime();
-            long duration = endTime - startTime;
-            welfordAlgorithm.add(duration);
         }
-        System.out.println("GiantTableStore temps moyen : " + welfordAlgorithm.getMean() + " ns");
-        System.out.println("GiantTableStore écart type : " + welfordAlgorithm.getStdDev() + " ns");
     }
     @Test
     public void benchmarkMatchHS_BIG_500K() {
-        // Implémentation du benchmark à venir
         System.out.println("--- Benchmark Hexastore BigSubset 500K ---");
-        WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
         for (int i = 0; i < NUM_RUNS_500K; i++) {
-            long startTime = System.nanoTime();
             testForBenchmark.testMatch(BIG_SUBSET_FILE_PATH, DATA_500K_FILE, new RDFHexaStore());
-            long endTime = System.nanoTime();
-            long duration = endTime - startTime;
-            welfordAlgorithm.add(duration);
         }
-        System.out.println("temps moyen : " + welfordAlgorithm.getMean() + " ns");
-        System.out.println("écart type : " + welfordAlgorithm.getStdDev() + " ns");
     }
     @Test
     public void benchmarkMatchHSNS_BIG_500K() {
-        // Implémentation du benchmark à venir
         System.out.println("--- Benchmark HexaStoreNoStats BigSubset 500K ---");
-        WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
         for (int i = 0; i < NUM_RUNS_500K; i++) {
-            long startTime = System.nanoTime();
             testForBenchmark.testMatch(BIG_SUBSET_FILE_PATH, DATA_500K_FILE, new RDFHexaStoreNoStatistic());
-            long endTime = System.nanoTime();
-            long duration = endTime - startTime;
-            welfordAlgorithm.add(duration);
         }
-        System.out.println("temps moyen : " + welfordAlgorithm.getMean() + " ns");
-        System.out.println("écart type : " + welfordAlgorithm.getStdDev() + " ns");
     }
 
     @Test
     public void benchmarkMatchGT_D34_500K() {
-        // Implémentation du benchmark à venir
         System.out.println("--- Benchmark GiantTableStore Degree 3+4 500K ---");
-        WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
         for (int i = 0; i < NUM_RUNS_500K; i++) {
-            long startTime = System.nanoTime();
             testForBenchmark.testMatch(DEGREE_3_4_FILE_PATH, DATA_500K_FILE, new GiantTableStore());
-            long endTime = System.nanoTime();
-            long duration = endTime - startTime;
-            welfordAlgorithm.add(duration);
         }
-        System.out.println("GiantTableStore temps moyen : " + welfordAlgorithm.getMean() + " ns");
-        System.out.println("GiantTableStore écart type : " + welfordAlgorithm.getStdDev() + " ns");
     }
     @Test
     public void benchmarkMatchHS_D34_500K() {
-        // Implémentation du benchmark à venir
         System.out.println("--- Benchmark Hexastore Degree 3+4 500K ---");
-        WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
         for (int i = 0; i < NUM_RUNS_500K; i++) {
-            long startTime = System.nanoTime();
             testForBenchmark.testMatch(DEGREE_3_4_FILE_PATH, DATA_500K_FILE, new RDFHexaStore());
-            long endTime = System.nanoTime();
-            long duration = endTime - startTime;
-            welfordAlgorithm.add(duration);
         }
-        System.out.println("temps moyen : " + welfordAlgorithm.getMean() + " ns");
-        System.out.println("écart type : " + welfordAlgorithm.getStdDev() + " ns");
     }
     @Test
     public void benchmarkMatchHSNS_D34_500K() {
-        // Implémentation du benchmark à venir
         System.out.println("--- Benchmark HexaStoreNoStats Degree 3+4 500K ---");
-        WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
         for (int i = 0; i < NUM_RUNS_500K; i++) {
-            long startTime = System.nanoTime();
             testForBenchmark.testMatch(DEGREE_3_4_FILE_PATH, DATA_500K_FILE, new RDFHexaStoreNoStatistic());
-            long endTime = System.nanoTime();
-            long duration = endTime - startTime;
-            welfordAlgorithm.add(duration);
         }
-        System.out.println("temps moyen : " + welfordAlgorithm.getMean() + " ns");
-        System.out.println("écart type : " + welfordAlgorithm.getStdDev() + " ns");
     }
     @Test
     public void benchmarkMatchGT_D1_500K() {
-        // Implémentation du benchmark à venir
         System.out.println("--- Benchmark GiantTableStore Degree 1 500K ---");
-        WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
         for (int i = 0; i < NUM_RUNS_500K; i++) {
-            long startTime = System.nanoTime();
             testForBenchmark.testMatch(DEGREE_1_FILE_PATH, DATA_500K_FILE, new GiantTableStore());
-            long endTime = System.nanoTime();
-            long duration = endTime - startTime;
-            welfordAlgorithm.add(duration);
         }
-        System.out.println("GiantTableStore temps moyen : " + welfordAlgorithm.getMean() + " ns");
-        System.out.println("GiantTableStore écart type : " + welfordAlgorithm.getStdDev() + " ns");
     }
     @Test
     public void benchmarkMatchHS_D1_500K() {
-        // Implémentation du benchmark à venir
         System.out.println("--- Benchmark Hexastore Degree 1 500K ---");
-        WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
         for (int i = 0; i < NUM_RUNS_500K; i++) {
-            long startTime = System.nanoTime();
             testForBenchmark.testMatch(DEGREE_1_FILE_PATH, DATA_500K_FILE, new RDFHexaStore());
-            long endTime = System.nanoTime();
-            long duration = endTime - startTime;
-            welfordAlgorithm.add(duration);
         }
-        System.out.println("temps moyen : " + welfordAlgorithm.getMean() + " ns");
-        System.out.println("écart type : " + welfordAlgorithm.getStdDev() + " ns");
     }
     @Test
     public void benchmarkMatchHSNS_D1_500K() {
-        // Implémentation du benchmark à venir
         System.out.println("--- Benchmark HexaStoreNoStats Degree 1 500K ---");
-        WelfordAlgorithm welfordAlgorithm = new WelfordAlgorithm();
         for (int i = 0; i < NUM_RUNS_500K; i++) {
-            long startTime = System.nanoTime();
             testForBenchmark.testMatch(DEGREE_1_FILE_PATH, DATA_500K_FILE, new RDFHexaStoreNoStatistic());
-            long endTime = System.nanoTime();
-            long duration = endTime - startTime;
-            welfordAlgorithm.add(duration);
         }
-        System.out.println("temps moyen : " + welfordAlgorithm.getMean() + " ns");
-        System.out.println("écart type : " + welfordAlgorithm.getStdDev() + " ns");
     }
 
 }

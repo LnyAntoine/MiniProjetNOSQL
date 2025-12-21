@@ -27,10 +27,11 @@ public class refinedAllQueries {
     private static final String QUERIES_1_SUBSCRIBE =  WORKING_DIR+TEMPLATE_DIR + "Q_1_subscribes_10000.queryset";
     private static final String SAMPLE_QUERY_FILE = WORKING_DIR + "sample_query.queryset";
     private static final String OUTPUT_QUERY_FILE_CST = WORKING_DIR +RSQ_OUTPUT_DIR+ "refined_queries.queryset";
+
+    //Raffine toutes les queries de degree 1 à 4 en un seul fichier
     public static void main(String[] args){
         FactBase factBase = new SimpleInMemoryGraphStore();
         HashMap<String, Integer> queriesCountMap = new HashMap<>();
-
 
         try {
             findOrCreateFile(SAMPLE_DATA_FILE);
@@ -93,11 +94,6 @@ public class refinedAllQueries {
                 System.out.println("    Nombre de doublons initiaux dans le fichier de sortie pour "+i+" : " + counterDoublonsInitial);
                 System.out.println("    Nombre de doublons ajoutés dans le fichier de sortie pour "+i+" : " + counterDoublons);
                 System.out.println("    Nombre total de requetes dans le fichier de sortie pour "+i+" : " + outputQueries.size());
-
-
-
-
-
             }
 
 

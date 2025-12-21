@@ -3,6 +3,8 @@ package qengine.storage;
 import java.util.Map;
 import java.util.Set;
 
+
+//Objet représentant une donnée pour l'hexastore
 public class DataValue {
     private long LongValue;
     private Map<Integer, DataValue> MapValue;

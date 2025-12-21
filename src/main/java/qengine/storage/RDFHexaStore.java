@@ -50,7 +50,7 @@ public class RDFHexaStore implements RDFStorage {
     }
 
 
-    public boolean addGeneric(Map<Integer, DataValue> map, Integer fst, Integer snd, Integer thrd, String mapName) {
+    public void addGeneric(Map<Integer, DataValue> map, Integer fst, Integer snd, Integer thrd, String mapName) {
         if (!map.containsKey(fst)) {
             HashMap<Integer, DataValue> fstValueHashMap = new HashMap<>();
             fstValueHashMap.put(-1, new DataValue(0L));
@@ -64,12 +64,11 @@ public class RDFHexaStore implements RDFStorage {
         }
 
         Set<Integer> set = map.get(fst).getMapValue().get(snd).getSetValue();
-        if (set.add(thrd)) { // Increment size only if the element is new
+        if (set.add(thrd)) {
             incrementSize(mapName);
         }
         map.get(fst).addToMap(snd, new DataValue(set));
         map.get(fst).addToMap(-1, new DataValue(map.get(fst).getMapValue().get(-1).getLongValue() + 1)); // Incrémenter le nombre de snd pour ce fst
-        return true;
     }
     private void incrementSize(String mapName) {
         switch (mapName) {
