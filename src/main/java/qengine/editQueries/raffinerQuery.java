@@ -1,13 +1,14 @@
-package qengine.utils;
+package qengine.editQueries;
 
 import fr.boreal.model.kb.api.FactBase;
 import fr.boreal.storage.natives.SimpleInMemoryGraphStore;
 import qengine.model.RDFTriple;
 import qengine.model.StarQuery;
+import qengine.utils.utils;
+
 import static qengine.program.Example.*;
 
 import java.io.IOException;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
 import java.io.PrintWriter;
@@ -27,27 +28,15 @@ public class raffinerQuery {
     private static final String QUERIES_1_SUBSCRIBE =  WORKING_DIR+TEMPLATE_DIR + "Q_1_subscribes_10000.queryset";
     private static final String SAMPLE_QUERY_FILE = WORKING_DIR + "sample_query.queryset";
     private static final String OUTPUT_QUERY_FILE = WORKING_DIR + "refined_queries.queryset";
+
+    //Raffine les queries en excluants les doublons et les requetes vides
     public static void main(String[] args){
         FactBase factBase = new SimpleInMemoryGraphStore();
         HashMap<String, Integer> queriesCountMap = new HashMap<>();
         int counterDoublonsInitial = 0;
         int counterDoublons = 0;
         try {
-            // Vérifier que le fichier de sortie existe; sinon créer son dossier parent (si nécessaire) et le fichier
-            File outFile = new File(OUTPUT_QUERY_FILE);
-            if (!outFile.exists()) {
-                File parent = outFile.getParentFile();
-                if (parent != null && !parent.exists()) {
-                    boolean createdDir = parent.mkdirs();
-                    if (!createdDir) {
-                        throw new IOException("Impossible de créer le dossier parent: " + parent.getAbsolutePath());
-                    }
-                }
-                boolean createdFile = outFile.createNewFile();
-                if (!createdFile) {
-                    throw new IOException("Impossible de créer le fichier de sortie: " + outFile.getAbsolutePath());
-                }
-            }
+            utils.findOrCreateFile(OUTPUT_QUERY_FILE);
 
             List<StarQuery> outputQueries = parseSparQLQueries(OUTPUT_QUERY_FILE);
             List<StarQuery> initialOutputQueries = new ArrayList<>(outputQueries);
@@ -79,8 +68,6 @@ public class raffinerQuery {
                     }
                     out.println(query.getLabel());
                     outputQueries.add(query);
-                    // aussi afficher en console
-                    //System.out.println("Requete retenue: " + query.getLabel());
                 }
             }
 

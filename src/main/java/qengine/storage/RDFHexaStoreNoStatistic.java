@@ -35,6 +35,10 @@ public class RDFHexaStoreNoStatistic implements RDFStorage {
     private final Dictionnaire dictionnaire;
     //private DB db;
 
+    public String getType(){
+        return "RDFHexaStoreNoStatistic";
+    }
+
     public RDFHexaStoreNoStatistic() {
 
         dictionnaire = new Dictionnaire();
@@ -89,6 +93,10 @@ public class RDFHexaStoreNoStatistic implements RDFStorage {
             default:
                 throw new IllegalArgumentException("Invalid map name: " + mapName);
         }
+    }
+    @Override
+    public Iterator<Substitution> match(StarQuery q){
+        return RDFStorage.super.matchWithoutStatistic(q);
     }
 
     public ArrayList<Substitution> matchGeneric(Map<Integer,Map<Integer,Set<Integer>>> map, Term fst, Term snd, Term thrd) {
@@ -221,10 +229,6 @@ public class RDFHexaStoreNoStatistic implements RDFStorage {
         return substitutions.iterator();
     }
 
-    @Override
-    public Iterator<Substitution> match(StarQuery q) {
-        return RDFStorage.super.matchWithoutStatistic(q);
-    }
 
     @Override
     public long howMany(RDFTriple triple) {

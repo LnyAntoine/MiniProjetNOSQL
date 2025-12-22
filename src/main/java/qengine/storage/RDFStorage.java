@@ -13,6 +13,10 @@ import qengine.utils.utils;
  */
 public interface RDFStorage {
 
+    default String getType(){
+        return "RDFStorage";
+    }
+
     /**
      * Ajoute un RDFAtom dans le store.
      *
@@ -36,7 +40,6 @@ public interface RDFStorage {
     default Iterator<Substitution> match(StarQuery q){
         try {
             q.getCentralVariable();
-
             List<RDFTriple> sortedAtoms = sortAtoms(q.getRdfAtoms());
             RDFTriple triple = sortedAtoms.getFirst();
             Iterator<Substitution> it = match(triple);

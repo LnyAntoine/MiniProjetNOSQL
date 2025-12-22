@@ -1,4 +1,4 @@
-package qengine.utils;
+package qengine.editQueries;
 
 import org.jetbrains.annotations.NotNull;
 import qengine.model.StarQuery;

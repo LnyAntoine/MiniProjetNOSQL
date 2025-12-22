@@ -9,6 +9,7 @@ import java.util.HashMap;
 import static qengine.utils.utils.createLiteralFromObject;
 import static qengine.utils.utils.createLiteralFromString;
 
+//Dictionnaire permettant l'encodage et le décodage des données pour les indexes
 public class Dictionnaire {
     protected HashMap<String, Integer> tableEncodage;
     protected HashMap<Integer, String> tableDecodage;
